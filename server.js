@@ -1,297 +1,67 @@
-require('dotenv').config();
 const express = require('express');
-const http = require('http');
-const { Server } = require('socket.io');
 const cors = require('cors');
-
+const admin = require('firebase-admin');
 const app = express();
-const server = http.createServer(app);
-const io = new Server(server, {
-  cors: { origin: "*", methods: ["GET","POST"] }
-});
-
-const PORT = process.env.PORT || 3000;
-const API_KEY = process.env.API_KEY || 'kv_live_2024_secret';
-
-app.use(cors({ origin: "*" }));
-app.use(express.json({ limit: '2mb' }));
-app.use(express.static('public'));
-
-// ===== IN-MEMORY STORES =====
-let accounts = {};
-let marketPrices = {}; // Filled by EA only - NO Deriv
-let robotKeys = {
-  "PHE0000E91": { name: "KAYVIEW CHARGER", expiresIn: "357d 12h", status: "LIVE" }
-};
-
-// ===== MIDDLEWARE =====
-function checkApiKey(req, res, next) {
-  const key = req.headers['x-api-key'] || req.query.api_key;
-  if (req.path.startsWith('/api/ea/')) {
-    if (key !== API_KEY) return res.status(401).json({ error: 'Invalid API_KEY' });
+app.use(cors());
+app.use(express.json());
+let db = null;
+try {
+  const keyJson = process.env.FIREBASE_KEY;
+  if (keyJson) {
+    const cred = JSON.parse(keyJson);
+    admin.initializeApp({ credential: admin.credential.cert(cred) });
+    db = admin.firestore();
+    console.log("FIRESTORE CONNECTED");
   }
-  next();
+} catch(e){ console.log("Firestore error", e); }
+app.get("/", (req,res)=> res.json({status:"Kayview API LIVE", firestore: !!db }));
+app.get("/health", async (req,res)=>{
+  let keysCount = 0;
+  if(db){ const s = await db.collection("prime_keys").get(); keysCount = s.size; }
+  res.json({ status:"ok", uptime: process.uptime(), prime_keys: keysCount });
+});
+function makeKey(){
+  const c = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+  let a="", b="";
+  for(let i=0;i<4;i++){ a+=c[Math.floor(Math.random()*c.length)]; b+=c[Math.floor(Math.random()*c.length)]; }
+  return `PHE-${a}-${b}`;
 }
-app.use(checkApiKey);
-
-// ===== ROUTES =====
-app.get('/health', (req, res) => {
-  res.json({ status: 'ok', uptime: process.uptime(), accounts: Object.keys(accounts).length, marketSymbols: Object.keys(marketPrices) });
+app.post("/prime/keys/generate", async (req,res)=>{
+  if(!db) return res.status(500).json({error:"No DB"});
+  const { username, email, duration_days, bot_name } = req.body;
+  const code = makeKey();
+  const days = Number(duration_days) || 30;
+  const expires = new Date(Date.now() + days*24*60*60*1000).toISOString();
+  const data = { code, username: username||"", email: email||"", bot_name: bot_name||"", duration_days: days, status:"UNUSED", created: new Date().toISOString(), expires };
+  const doc = await db.collection("prime_keys").add(data);
+  res.json({ success:true, id: doc.id, ...data });
 });
-
-app.get('/api/market', (req, res) => {
-  res.json({ success: true, source: 'EA', prices: marketPrices });
+app.get("/prime/keys", async (req,res)=>{
+  if(!db) return res.json([]);
+  const snap = await db.collection("prime_keys").get();
+  res.json(snap.docs.map(d=>({id:d.id, ...d.data()})));
 });
-
-app.get('/api/market/:symbol', (req, res) => {
-  const sym = req.params.symbol;
-  const p = marketPrices[sym] || marketPrices['frx'+sym];
-  if (!p) return res.status(404).json({ success: false, error: 'No EA price yet. Connect EA first.' });
-  res.json({ success: true, ...p });
+app.get("/keys/validate", async (req,res)=>{
+  const key = (req.query.key || "").trim().toUpperCase();
+  if(!key) return res.json({ valid:false, error:"No key" });
+  if(!db) return res.json({ valid:false, error:"No DB" });
+  const snap = await db.collection("prime_keys").where("code","==",key).get();
+  if(snap.empty) return res.json({ valid:false, error:"Key not found" });
+  const doc = snap.docs[0];
+  const data = doc.data();
+  if(data.status === "INACTIVE") return res.json({ valid:false, error:"Key deactivated" });
+  if(new Date(data.expires) < new Date()) return res.json({ valid:false, error:"Key expired" });
+  if(data.status === "UNUSED"){ await doc.ref.update({ status:"ACTIVE", activated: new Date().toISOString() }); }
+  res.json({ valid:true, bot: data.bot_name||"SlowMo Bizz", expires: data.expires, email: data.email });
 });
-
-// ---- ROBOT KEYS ----
-app.get('/api/robots', (req, res) => {
-  const list = Object.entries(robotKeys).map(([key, v]) => ({ key, ...v }));
-  res.json({ success: true, robots: list });
+app.post("/prime/keys/toggle", async (req,res)=>{
+  const { id, status } = req.body;
+  await db.collection("prime_keys").doc(id).update({ status });
+  res.json({ success:true, status });
 });
-
-app.post('/api/keys/validate', (req, res) => {
-  const { key } = req.body;
-  if (robotKeys[key]) {
-    res.json({ success: true, valid: true, robot: robotKeys[key] });
-  } else if (key && key.startsWith('PHE')) {
-    res.json({ success: true, valid: true, robot: { name: "KAYVIEW CHARGER", expiresIn: "357d 12h", status: "LIVE" } });
-  } else {
-    res.json({ success: false, valid: false, error: 'Invalid key' });
-  }
+app.delete("/prime/keys/:id", async (req,res)=>{
+  await db.collection("prime_keys").doc(req.params.id).delete();
+  res.json({ success:true });
 });
-
-// ---- CONNECT MT ACCOUNT (Web -> Server) ----
-app.post('/api/connect', (req, res) => {
-  const { accountId, password, serverName, platform } = req.body;
-  if (!accountId) return res.status(400).json({ success: false, error: 'accountId required' });
-  const id = String(accountId);
-  if (!accounts[id]) {
-    accounts[id] = {
-      id, password, serverName: serverName || 'Unknown', platform: platform || 'MT5',
-      status: 'pending_ea', accountInfo: null, positions: [], history: [],
-      pendingTrades: [], logs: [], eaConnected: false, lastSeen: null, createdAt: Date.now()
-    };
-  } else {
-    accounts[id].password = password || accounts[id].password;
-    accounts[id].serverName = serverName || accounts[id].serverName;
-    accounts[id].platform = platform || accounts[id].platform;
-  }
-  accounts[id].logs.push({ time: new Date().toLocaleTimeString(), msg: `CONNECT request: ${id} @ ${serverName} - Waiting for EA`, type: 'info' });
-  if (accounts[id].logs.length > 200) accounts[id].logs.shift();
-  io.emit('account:status', { accountId: id, status: accounts[id].status });
-  res.json({ success: true, message: 'Account registered. Install EA with same Account ID and API URL.', accountId: id, status: accounts[id].status });
-});
-
-// ---- EA ENDPOINTS ----
-app.post('/api/ea/online', (req, res) => {
-  const { accountId, accountInfo, positions, balance, equity, prices } = req.body;
-  if (!accountId) return res.status(400).json({ success: false, error: 'accountId required' });
-  const id = String(accountId);
-  if (!accounts[id]) {
-    accounts[id] = { id, status: 'connected', accountInfo: null, positions: [], history: [], pendingTrades: [], logs: [], eaConnected: true, lastSeen: Date.now(), createdAt: Date.now() };
-  }
-  accounts[id].accountInfo = accountInfo || { balance, equity, accountId: id, server: accounts[id].serverName };
-  if (balance) accounts[id].accountInfo.balance = balance;
-  if (equity) accounts[id].accountInfo.equity = equity;
-  accounts[id].positions = positions || accounts[id].positions;
-  accounts[id].eaConnected = true;
-  accounts[id].status = 'connected';
-  accounts[id].lastSeen = Date.now();
-  // EA prices -> marketPrices
-  if (prices) {
-    for (const [sym, p] of Object.entries(prices)) {
-      marketPrices[sym] = { symbol: sym, price: parseFloat(p.price || p), bid: parseFloat(p.bid || p.price || p), ask: parseFloat(p.ask || p.price || p), time: Date.now() };
-      io.emit('market:tick', marketPrices[sym]);
-    }
-  }
-  io.to(`account_${id}`).emit('account:update', accounts[id].accountInfo);
-  io.to(`account_${id}`).emit('positions:update', accounts[id].positions);
-  io.emit('account:status', { accountId: id, status: 'connected', accountInfo: accounts[id].accountInfo });
-  res.json({ success: true, pendingTrades: accounts[id].pendingTrades });
-});
-
-app.post('/api/ea/heartbeat', (req, res) => {
-  const { accountId, accountInfo, positions, prices } = req.body;
-  const id = String(accountId);
-  if (accounts[id]) {
-    if (accountInfo) accounts[id].accountInfo = { ...accounts[id].accountInfo, ...accountInfo };
-    if (positions) accounts[id].positions = positions;
-    accounts[id].lastSeen = Date.now();
-    accounts[id].eaConnected = true;
-    if (prices) {
-      for (const [sym, p] of Object.entries(prices)) {
-        marketPrices[sym] = { symbol: sym, price: parseFloat(p.price || p), bid: parseFloat(p.bid || p.price || p), ask: parseFloat(p.ask || p.price || p), time: Date.now() };
-        io.emit('market:tick', marketPrices[sym]);
-      }
-    }
-    io.to(`account_${id}`).emit('account:update', accounts[id].accountInfo);
-    io.to(`account_${id}`).emit('positions:update', accounts[id].positions);
-  }
-  res.json({ success: true, pendingTrades: accounts[id]?.pendingTrades || [] });
-});
-
-app.post('/api/ea/log', (req, res) => {
-  const { accountId, message, type } = req.body;
-  const id = String(accountId);
-  if (!accounts[id]) return res.json({ success: false });
-  const logEntry = { time: new Date().toLocaleTimeString(), msg: message, type: type || 'info' };
-  accounts[id].logs.push(logEntry);
-  if (accounts[id].logs.length > 200) accounts[id].logs.shift();
-  io.to(`account_${id}`).emit('log:new', logEntry);
-  if (message.includes('BUY') || message.includes('SELL') || message.includes('TP ADDED') || message.includes('SL ADDED')) {
-    io.to(`account_${id}`).emit('trade:executed', logEntry);
-  }
-  res.json({ success: true });
-});
-
-app.post('/api/ea/tradeResult', (req, res) => {
-  const { accountId, ticket, success, error, price } = req.body;
-  const id = String(accountId);
-  io.to(`account_${id}`).emit('trade:result', { ticket, success, error, price, time: new Date().toLocaleTimeString() });
-  res.json({ success: true });
-});
-
-app.get('/api/ea/:id/pendingTrades', (req, res) => {
-  const id = String(req.params.id);
-  const trades = accounts[id]?.pendingTrades || [];
-  res.json({ success: true, trades });
-});
-
-// ---- WEB ENDPOINTS ----
-app.get('/api/:id/account', (req, res) => {
-  const acc = accounts[req.params.id];
-  if (!acc) return res.status(404).json({ success: false, error: 'Account not connected' });
-  res.json({ success: true, account: acc.accountInfo, status: acc.status, eaConnected: acc.eaConnected, lastSeen: acc.lastSeen });
-});
-
-app.get('/api/:id/positions', (req, res) => {
-  const acc = accounts[req.params.id];
-  if (!acc) return res.status(404).json({ success: false, error: 'Account not found' });
-  res.json({ success: true, positions: acc.positions, count: acc.positions.length });
-});
-
-app.get('/api/:id/history', (req, res) => {
-  const acc = accounts[req.params.id];
-  if (!acc) return res.status(404).json({ success: false, error: 'Account not found' });
-  res.json({ success: true, history: acc.history });
-});
-
-app.get('/api/:id/logs', (req, res) => {
-  const acc = accounts[req.params.id];
-  if (!acc) return res.json({ success: true, logs: [] });
-  res.json({ success: true, logs: acc.logs });
-});
-
-app.post('/api/:id/trade', (req, res) => {
-  const id = String(req.params.id);
-  if (!accounts[id]) return res.status(404).json({ success: false, error: 'Account not found. Connect EA first.' });
-  const { symbol, action, lot, sl, tp, price } = req.body;
-  const livePrice = marketPrices[symbol] || marketPrices['frx'+symbol] || { price: price || 0 };
-  const tradeReq = {
-    id: Date.now().toString(),
-    symbol: symbol || 'XAUUSD',
-    action: action || 'BUY',
-    lot: parseFloat(lot) || 0.03,
-    sl: sl || 0,
-    tp: tp || 0,
-    price: livePrice.price || price,
-    livePrice: livePrice.price,
-    status: 'pending',
-    createdAt: Date.now(),
-    createdAtStr: new Date().toLocaleTimeString()
-  };
-  accounts[id].pendingTrades.push(tradeReq);
-  accounts[id].logs.push({ time: tradeReq.createdAtStr, msg: `Trade request: ${action} ${symbol} @ ${tradeReq.livePrice} vol ${lot}`, type: 'request' });
-  if (accounts[id].logs.length > 200) accounts[id].logs.shift();
-  io.to(`ea_${id}`).emit('trade:request', tradeReq);
-  io.to(`account_${id}`).emit('trade:pending', tradeReq);
-  res.json({ success: true, message: 'Trade queued - EA will execute with LIVE broker price', trade: tradeReq });
-});
-
-app.delete('/api/:id/trade/:tradeId', (req, res) => {
-  const id = String(req.params.id);
-  if (accounts[id]) {
-    accounts[id].pendingTrades = accounts[id].pendingTrades.filter(t => t.id !== req.params.tradeId);
-  }
-  res.json({ success: true });
-});
-
-// ---- ANALYSE - Uses EA price only ----
-app.post('/api/analyse', (req, res) => {
-  const { symbol, lot, trades } = req.body;
-  const sym = symbol || 'XAUUSD';
-  const live = marketPrices[sym] || marketPrices['frx'+sym];
-  if (!live) return res.status(400).json({ success: false, error: 'No EA price yet. Connect EA first.' });
-  const price = live.price;
-  const signal = Math.random() > 0.5 ? 'BUY' : 'SELL';
-  const tp = signal === 'BUY' ? (price * 1.002).toFixed(2) : (price * 0.998).toFixed(2);
-  const sl = signal === 'BUY' ? (price * 0.999).toFixed(2) : (price * 1.001).toFixed(2);
-  res.json({ success: true, live: true, source: 'EA', symbol: sym, price, signal, tp: parseFloat(tp), sl: parseFloat(sl), lot: parseFloat(lot) || 0.03, trades: parseInt(trades) || 10, timestamp: new Date().toISOString(), message: `LIVE Broker Signal @ ${price.toFixed(2)} - ${signal}` });
-});
-
-// ---- ADMIN ----
-app.get('/api/admin/accounts', (req, res) => {
-  const list = Object.values(accounts).map(a => ({ id: a.id, status: a.status, eaConnected: a.eaConnected, lastSeen: a.lastSeen, serverName: a.serverName, platform: a.platform, balance: a.accountInfo?.balance, positions: a.positions?.length || 0 }));
-  res.json({ success: true, accounts: list });
-});
-
-app.delete('/api/admin/accounts/:id', (req, res) => {
-  delete accounts[req.params.id];
-  res.json({ success: true });
-});
-
-// ===== SOCKET.IO =====
-io.on('connection', (socket) => {
-  socket.on('join:account', (accountId) => {
-    const id = String(accountId);
-    socket.join(`account_${id}`);
-    if (accounts[id]) {
-      socket.emit('account:update', accounts[id].accountInfo);
-      socket.emit('positions:update', accounts[id].positions);
-      socket.emit('logs:update', accounts[id].logs);
-    }
-  });
-  socket.on('join:ea', (data) => {
-    const { accountId, apiKey } = data;
-    if (apiKey !== API_KEY) { socket.emit('error', { message: 'Invalid API key' }); return; }
-    const id = String(accountId);
-    socket.join(`ea_${id}`);
-    socket.join(`account_${id}`);
-    if (accounts[id]) { accounts[id].eaConnected = true; accounts[id].lastSeen = Date.now(); accounts[id].status = 'connected'; }
-  });
-  socket.on('ea:accountUpdate', (data) => {
-    const { accountId, accountInfo, positions } = data;
-    const id = String(accountId);
-    if (accounts[id]) {
-      accounts[id].accountInfo = accountInfo;
-      accounts[id].positions = positions || [];
-      accounts[id].lastSeen = Date.now();
-      io.to(`account_${id}`).emit('account:update', accountInfo);
-      io.to(`account_${id}`).emit('positions:update', positions);
-    }
-  });
-  socket.on('ea:log', (data) => {
-    const { accountId, message } = data;
-    const id = String(accountId);
-    if (accounts[id]) {
-      const entry = { time: new Date().toLocaleTimeString(), msg: message, type: 'live' };
-      accounts[id].logs.push(entry);
-      if (accounts[id].logs.length > 200) accounts[id].logs.shift();
-      io.to(`account_${id}`).emit('log:new', entry);
-    }
-  });
-});
-
-// ===== START =====
-server.listen(PORT, () => {
-  console.log(`KAYVIEW CHARGER API - NO DERIV`);
-  console.log(`Running on port ${PORT}`);
-  console.log(`Health: /health`);
-});
+const PORT = process.env.PORT || 10000;
+app.listen(PORT, '0.0.0.0', ()=> console.log(`Live on ${PORT}`));
