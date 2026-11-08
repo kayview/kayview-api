@@ -36,7 +36,6 @@ label{font-size:13px;font-weight:600}
 
 <div class="top"><b>Prime Host <span>EA</span></b><span>↗ Sign in</span></div>
 
-<!-- LANDING -->
 <div id="page-landing">
 <div class="hero">
 <small>● INSTITUTIONAL TRADING INFRASTRUCTURE • ZAR</small>
@@ -57,16 +56,15 @@ label{font-size:13px;font-weight:600}
 <p style="font-size:13px">✓ Unlimited bot builds (MQL4/MQL5)<br>✓ Issue & manage student keys<br>✓ Approve hosted & self-host clients<br>✓ Payment proof workflow<br>✓ Mentor dashboard + analytics</p>
 <button class="btn btn-blue" onclick="show('console')">Open mentor account →</button></div>
 <div class="card"><b>SETUP GUIDE</b><h3>Connect your MT4 / MT5 in 5 calm steps.</h3>
-<p><b>1 • Receive your key</b><br><span style="color:#64748b;font-size:13px">Your mentor approves your request and sends a PHE key (e.g. PHE-POO-HOO-EOO) via WhatsApp.</span></p>
+<p><b>1 • Receive your key</b><br><span style="color:#64748b;font-size:13px">Your mentor approves your request and sends a PHE key via WhatsApp.</span></p>
 <p><b>2 • Download the Self-Host EA</b><br><span style="color:#64748b;font-size:13px">Download the .mq5 (MT5) or .mq4 (MT4) file. Copy it into MQL5/Experts/.</span></p>
 <p><b>3 • Allow WebRequest URLs</b><br><span style="color:#64748b;font-size:13px">In MetaTrader: Tools → Options → Expert Advisors → Allow WebRequest, add the URL printed inside the EA settings.</span></p>
 <p><b>4 • Attach the EA to a chart</b><br><span style="color:#64748b;font-size:13px">Drag the EA onto any chart, paste your PHE key into the Inputs tab, enable Auto-Trading.</span></p>
 <p><b>5 • Open the app + go live</b><br><span style="color:#64748b;font-size:13px">Open prime-host-ea in your browser, paste the same key, you'll see Server Online.</span></p></div>
 </div>
 
-<!-- CONSOLE -->
 <div id="page-console" class="hidden">
-<div style="padding:16px"><small style="color:#2563eb;letter-spacing:2px;font-weight:700">MENTOR CONSOLE</small><h2 style="margin:4px 0;font-size:26px">Welcome back, <span id="dispName">Junior</span></h2><span style="background:#dbeafe;color:#2563eb;padding:4px 10px;border-radius:99px;font-size:12px" id="mentorId">MT-9994</span></div>
+<div style="padding:16px"><small style="color:#2563eb;letter-spacing:2px;font-weight:700">MENTOR CONSOLE</small><h2 style="margin:4px 0;font-size:26px">Welcome back, <span id="dispName"></span></h2><span style="background:#dbeafe;color:#2563eb;padding:4px 10px;border-radius:99px;font-size:12px" id="mentorId">MT-9994</span></div>
 
 <div id="tab-overview">
 <div class="grid">
@@ -76,16 +74,16 @@ label{font-size:13px;font-weight:600}
 <div class="stat">🤖<br><b id="botNum">1</b><p>BOTS CURATED</p></div>
 <div class="stat">📱<br><b>1</b><p>LIVE SESSIONS</p></div>
 </div>
-<div class="card"><b>Students using your mentor ID</b><p style="color:#64748b;font-size:13px">Latest access requests routed to your desk.</p><div style="display:flex;justify-content:space-between"><span id="studEmail">robotsellers212@gmail.com</span><span style="background:#dcfce7;padding:4px 10px;border-radius:99px;font-size:11px">ALLOWED</span></div></div>
+<div class="card"><b>Students using your mentor ID</b><p style="color:#64748b;font-size:13px">Latest access requests routed to your desk.</p><div style="display:flex;justify-content:space-between"><span id="studEmail">No students yet</span><span style="background:#dcfce7;padding:4px 10px;border-radius:99px;font-size:11px">ALLOWED</span></div></div>
 </div>
 
 <div id="tab-profile" class="hidden">
 <div style="padding:0 16px"><h2>Profile</h2><p style="color:#64748b">Your mentor identity.</p></div>
-<div class="card"><div style="display:flex;gap:12px;align-items:center"><div class="avatar" id="avatarLetter">J</div><div><button class="btn btn-white">↑ Upload avatar</button><br><small style="color:#2563eb" id="profId">MT-9994</small></div></div>
-<label>Display name</label><input id="inDisp" value="Junior" oninput="document.getElementById('dispName').innerText=this.value;document.getElementById('avatarLetter').innerText=this.value[0]||'J'">
-<label>Username</label><input id="inUser" value="Junior">
-<label>Email</label><input id="inEmail" value="robotsellers212@gmail.com">
-<label>Phone</label><input id="inPhone" value="07773757273">
+<div class="card"><div style="display:flex;gap:12px;align-items:center"><div class="avatar" id="avatarLetter">?</div><div><button class="btn btn-white">↑ Upload avatar</button><br><small style="color:#2563eb" id="profId">MT-9994</small></div></div>
+<label>Display name</label><input id="inDisp" value="" placeholder="Enter display name" oninput="document.getElementById('dispName').innerText=this.value;document.getElementById('avatarLetter').innerText=this.value[0]||'?'">
+<label>Username</label><input id="inUser" value="" placeholder="Enter username">
+<label>Email</label><input id="inEmail" value="" placeholder="Enter email">
+<label>Phone</label><input id="inPhone" value="" placeholder="Enter phone">
 <button class="btn btn-blue" onclick="alert('Saved ✓')">Save changes</button></div>
 </div>
 
@@ -104,15 +102,14 @@ label{font-size:13px;font-weight:600}
 <div style="text-align:center"><h2>Key Shop</h2><p style="color:#64748b">Stock available: <b style="color:#2563eb" id="stock3">5</b></p></div>
 <div class="card" style="text-align:center"><div style="width:70px;height:70px;background:#000;color:#fff;border-radius:50%;margin:0 auto;display:flex;align-items:center;justify-content:center;font-weight:900">P<br>PRIME</div><p>PER KEY</p><h1 style="color:#2563eb;margin:0">R100</h1><br>
 <div class="shopnum"><button onclick="chg(-1)">−</button><b id="qty" style="font-size:22px">1</b><button onclick="chg(1)">+</button></div><p>Total: <b id="total">R100</b></p>
-<div class="bank"><b style="font-size:18px">PRIME HOST EA<br>BANKING DETAILS</b><p style="font-size:12px;color:#94a3b8">Please use the following banking details for any payments made to Prime Host EA.</p><p>🏦 NAME OF BANK<br><b>ABSA</b></p><p>💳 ACCOUNT NUMBER<br><b>9401882040</b></p><p>⏱ PLEASE USE IMMEDIATE PAYMENT TO FASTEN THE PROCESS</p></div>
+<div class="bank"><b style="font-size:18px">PRIME HOST EA<br>BANKING DETAILS</b><p style="font-size:12px;color:#94a3b8">Please use the following banking details for any payments made to Prime Host EA.</p><p>🏦 NAME OF BANK<br><b>TymeBank</b></p><p>💳 ACCOUNT NUMBER<br><b>51107457045</b></p><p>⏱ PLEASE USE IMMEDIATE PAYMENT TO FASTEN THE PROCESS</p></div>
 <p style="text-align:left"><b>AMOUNT</b> <span style="color:#2563eb" id="amt2">R100</span> &nbsp; <b>REFERENCE</b> <span id="ref2">MT-9994-KEYS-1</span></p>
-<div class="wa"><span style="font-size:22px">🟢</span><div><b>Send proof on WhatsApp</b><br>+27 77 375 7273</div></div>
-<p style="font-size:13px;color:#64748b;text-align:left">Send proof of your ABSA <span id="amt3">R100</span> transfer on WhatsApp. The owner will add <span id="qty2">1</span> stock keys to your shop.</p>
+<div class="wa"><span style="font-size:22px">🟢</span><div><b>Send proof on WhatsApp</b><br>+27 73 081 9637</div></div>
+<p style="font-size:13px;color:#64748b;text-align:left">Send proof of your TymeBank <span id="amt3">R100</span> transfer on WhatsApp. The owner will add <span id="qty2">1</span> stock keys to your shop.</p>
 <button class="btn btn-blue btn-block" onclick="sentProof()">✉️ I've sent the proof</button>
 </div></div>
 </div>
 
-<!-- BOTTOM NAV -->
 <div class="nav" id="bottomNav" style="display:none">
 <button onclick="tab('overview')" id="n-overview" class="on">⊞<br>Overview</button>
 <button onclick="tab('profile')" id="n-profile">👤<br>Profile</button>
@@ -121,11 +118,9 @@ label{font-size:13px;font-weight:600}
 <button onclick="tab('shop')" id="n-shop">🛒<br>Key Shop</button>
 </div>
 
-<!-- CREATE BOT MODAL -->
-<div class="modal" id="botModal"><div class="sheet"><div style="display:flex;justify-content:space-between"><h3>Create Bot</h3><button onclick="closeAll()">✕</button></div><button class="btn btn-white">↑ Upload image</button><br><br><label>Bot name</label><input id="botName" value="THE SHADOW ELITE SCALPER 2.0"><label>Pairs</label><div style="display:flex;gap:8px"><input id="pairIn" placeholder="e.g. XAUUSD"><button class="btn btn-white" onclick="addPair()">+</button></div><div id="pairTags"></div><div style="display:flex;justify-content:flex-end;gap:8px"><button class="btn btn-white" onclick="closeAll()">Cancel</button><button class="btn btn-blue" onclick="saveBot()">Save</button></div></div></div>
+<div class="modal" id="botModal"><div class="sheet"><div style="display:flex;justify-content:space-between"><h3>Create Bot</h3><button onclick="closeAll()">✕</button></div><button class="btn btn-white">↑ Upload image</button><br><br><label>Bot name</label><input id="botName" value="" placeholder="Enter bot name"><label>Pairs</label><div style="display:flex;gap:8px"><input id="pairIn" placeholder="e.g. XAUUSD"><button class="btn btn-white" onclick="addPair()">+</button></div><div id="pairTags"></div><div style="display:flex;justify-content:flex-end;gap:8px"><button class="btn btn-white" onclick="closeAll()">Cancel</button><button class="btn btn-blue" onclick="saveBot()">Save</button></div></div></div>
 
-<!-- GENERATE KEY MODAL -->
-<div class="modal" id="keyModal"><div class="sheet"><div style="display:flex;justify-content:space-between"><h3>Generate new key</h3><button onclick="closeAll()">✕</button></div><label>Username</label><input id="kUser" placeholder="Junior"><label>Email</label><input id="kEmail" placeholder="juniormoshole5@gmail.com"><label>Duration</label><select id="kDays"><option value="7">7 days</option><option value="30" selected>30 days</option><option value="90">90 days</option><option value="365">1 year</option></select><label>Bot profile</label><select id="kBot"></select><button class="btn btn-blue btn-block" id="genBtn" onclick="doGen()">Generate</button></div></div>
+<div class="modal" id="keyModal"><div class="sheet"><div style="display:flex;justify-content:space-between"><h3>Generate new key</h3><button onclick="closeAll()">✕</button></div><label>Username</label><input id="kUser" placeholder="Enter username"><label>Email</label><input id="kEmail" placeholder="Enter email"><label>Duration</label><select id="kDays"><option value="7">7 days</option><option value="30" selected>30 days</option><option value="90">90 days</option><option value="365">1 year</option></select><label>Bot profile</label><select id="kBot"></select><button class="btn btn-blue btn-block" id="genBtn" onclick="doGen()">Generate</button></div></div>
 
 <script>
 const API="https://kayview-api.onrender.com";
@@ -142,10 +137,10 @@ function openKey(){if(stock<=0) return alert('No stock! Top up in Key Shop'); do
 function closeAll(){document.querySelectorAll('.modal').forEach(m=>m.classList.remove('open'))}
 function updateStock(){['stockNum','stock2','stock3'].forEach(id=>document.getElementById(id).innerText=stock); localStorage.setItem('ph_stock',stock);}
 async function loadKeys(){try{let r=await fetch(API+'/prime/keys'); keys=await r.json();}catch(e){keys=[]} document.getElementById('genCount').innerText=keys.length; document.getElementById('activeNum').innerText=keys.filter(k=>k.status==='ACTIVE').length; document.getElementById('actCount').innerText=keys.filter(k=>k.status==='ACTIVE').length; document.getElementById('studNum').innerText=keys.length?1:0; let el=document.getElementById('keyList'); if(!keys.length){el.innerHTML='<p style="text-align:center;color:#64748b">No keys generated yet.</p>';return} el.innerHTML=keys.map(k=>`<div class="keycard"><div style="display:flex;justify-content:space-between"><span class="keycode">${k.code}</span><span class="badge ${k.status==='INACTIVE'?'red':''}">${k.status}</span></div><p style="margin:8px 0 4px">${k.username} • ${k.email}</p><small style="color:#64748b">Bot: ${k.bot_name} • ${k.duration_days}d</small><br><div style="display:flex;gap:8px;margin-top:10px"><button class="smallbtn" style="flex:1;background:${k.status==='INACTIVE'?'#2563eb':'#fff'};color:${k.status==='INACTIVE'?'#fff':'#000'}" onclick="toggleKey('${k.id}','${k.status}')">${k.status==='INACTIVE'?'↻ Reactivate':'⊘ Deactivate'}</button><button class="smallbtn del" onclick="delKey('${k.id}')">🗑</button></div></div>`).join('');}
-async function doGen(){let btn=document.getElementById('genBtn'); btn.innerText='Generating...'; let body={username:document.getElementById('kUser').value||'Junior',email:document.getElementById('kEmail').value||'',duration_days:Number(document.getElementById('kDays').value),bot_name:document.getElementById('kBot').value}; let r=await fetch(API+'/prime/keys/generate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)}); let d=await r.json(); stock=Math.max(0,stock-1); updateStock(); closeAll(); btn.innerText='Generate'; alert('Generated '+d.code); loadKeys();}
+async function doGen(){let btn=document.getElementById('genBtn'); btn.innerText='Generating...'; let body={username:document.getElementById('kUser').value||'',email:document.getElementById('kEmail').value||'',duration_days:Number(document.getElementById('kDays').value),bot_name:document.getElementById('kBot').value}; let r=await fetch(API+'/prime/keys/generate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)}); let d=await r.json(); stock=Math.max(0,stock-1); updateStock(); closeAll(); btn.innerText='Generate'; alert('Generated '+d.code); loadKeys();}
 async function toggleKey(id,st){let ns=st==='INACTIVE'?'UNUSED':'INACTIVE'; if(ns==='UNUSED' && !confirm('Reactivate this key? Resets to unused so the student can use it again.')) return; await fetch(API+'/prime/keys/toggle',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id,status:ns})}); alert(ns==='INACTIVE'?'Inactive':'Key reactivated'); loadKeys();}
 async function delKey(id){if(!confirm('Delete this key?')) return; await fetch(API+'/prime/keys/'+id,{method:'DELETE'}); loadKeys();}
 function chg(d){qty=Math.max(1,qty+d); document.getElementById('qty').innerText=qty; document.getElementById('qty2').innerText=qty; document.getElementById('total').innerText='R'+(qty*100); document.getElementById('amt2').innerText='R'+(qty*100); document.getElementById('amt3').innerText='R'+(qty*100); document.getElementById('ref2').innerText='MT-9994-KEYS-'+qty+' ('+qty*100+')';}
-function sentProof(){let msg='Send '+ (qty*100) +' proof on WhatsApp. The owner will add '+qty+' keys to your stock.'; alert(msg); stock+=qty; updateStock(); window.open('https://wa.me/27773757273?text='+encodeURIComponent('Hi, I sent R'+(qty*100)+' for '+qty+' Prime Host keys. Ref: MT-9994-KEYS-'+qty),'_blank');}
+function sentProof(){alert('Send R'+(qty*100)+' proof on WhatsApp. The owner will add '+qty+' keys to your stock.'); stock+=qty; updateStock(); window.open('https://wa.me/27730819637?text='+encodeURIComponent('Hi, I sent R'+(qty*100)+' for '+qty+' Prime Host keys. Ref: MT-9994-KEYS-'+qty),'_blank');}
 renderBots(); updateStock(); loadKeys();
 </script></body></html>
