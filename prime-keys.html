@@ -1,188 +1,178 @@
 <!DOCTYPE html>
-<html><head><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Ambient Host EA - Mentor Console</title>
+<html><head><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Ambient Host EA</title>
 <style>
-*{box-sizing:border-box;font-family:Inter,Arial,sans-serif}
-body{margin:0;background:#eef4ff;color:#0f172a;padding-bottom:90px}
-.top{display:flex;justify-content:space-between;align-items:center;padding:14px 16px;background:#fff}
-.top b{font-size:18px}.top b span{color:#2563eb}
-.hero{padding:20px 16px}
-.hero small{color:#2563eb;letter-spacing:2px;font-weight:700;font-size:11px}
-.hero h1{font-size:28px;line-height:1.1;margin:8px 0}.hero h1 i{color:#2563eb;font-style:italic;font-family:serif}
-.hero p{color:#64748b;font-size:14px;line-height:1.5}
-.btn{border:none;border-radius:999px;padding:13px 18px;font-weight:700;cursor:pointer}
-.btn-blue{background:#2563eb;color:#fff}.btn-white{background:#fff;border:1px solid #e2e8f0}.btn-block{width:100%}
-.card{background:#fff;border-radius:16px;padding:16px;margin:12px 16px;box-shadow:0 2px 10px rgba(0,0,0,.04)}
+*{box-sizing:border-box;font-family:Inter,system-ui,Arial,sans-serif;-webkit-tap-highlight-color:transparent}
+body{margin:0;background:#f1f5f9;color:#0f172a;padding-bottom:96px;overflow-x:hidden}
+a{color:#2563eb;text-decoration:none}
+.top{position:sticky;top:0;z-index:20;display:flex;justify-content:space-between;align-items:center;padding:14px 16px;background:rgba(255,255,255,.9);backdrop-filter:blur(12px);border-bottom:1px solid #e2e8f0}
+.logo{display:flex;gap:10px;align-items:center}.logoIcon{width:36px;height:36px;background:#0f172a;color:#fff;border-radius:10px;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:16px}
+.liveDot{width:8px;height:8px;background:#22c55e;border-radius:50%;display:inline-block;animation:pulse 1.5s infinite}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(34,197,94,.5)}70%{box-shadow:0 0 0 8px rgba(34,197,94,0)}100%{box-shadow:0 0 0 0 rgba(34,197,94,0)}}
+@keyframes slideUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+@keyframes shimmer{0%{background-position:-200px 0}100%{background-position:200px 0}}
+.page{animation:slideUp .35s ease}
+.hero{background:linear-gradient(135deg,#0f172a 0%,#1e3a8a 60%,#2563eb 100%);color:#fff;padding:28px 20px 32px;border-radius:0 0 28px 28px}
+.hero small{color:#93c5fd;letter-spacing:2px;font-weight:700;font-size:11px}
+.hero h1{font-size:32px;line-height:1.05;margin:10px 0}.hero h1 i{color:#60a5fa;font-style:italic;font-family:Georgia,serif}
+.hero p{color:#cbd5e1;font-size:14px;line-height:1.6}
+.btn{border:none;border-radius:999px;padding:14px 18px;font-weight:700;cursor:pointer;transition:.2s;active:scale(.97)}
+.btn-blue{background:linear-gradient(135deg,#2563eb,#0ea5e9);color:#fff;box-shadow:0 8px 20px rgba(37,99,235,.35)}
+.btn-white{background:#fff;border:1px solid #e2e8f0;color:#0f172a}.btn-block{width:100%}
+.btn-ghost{background:rgba(255,255,255,.15);color:#fff;border:1px solid rgba(255,255,255,.25)}
+.card{background:#fff;border-radius:20px;padding:18px;margin:14px 16px;box-shadow:0 4px 20px rgba(15,23,42,.06);border:1px solid #f1f5f9}
 .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:0 16px}
-.stat{background:#fff;border-radius:16px;padding:16px}.stat b{font-size:28px}.stat p{font-size:11px;letter-spacing:1px;color:#64748b;margin:6px 0 0}.stat a{font-size:11px;color:#2563eb}
-input,select{width:100%;padding:13px;border-radius:12px;border:1px solid #e2e8f0;background:#f1f5f9;margin:6px 0 12px;font-size:14px}
-label{font-size:13px;font-weight:600}
-.nav{position:fixed;bottom:0;left:0;right:0;background:#fff;display:flex;border-top:1px solid #e2e8f0;padding:8px 0 14px}
-.nav button{flex:1;background:none;border:none;font-size:11px;color:#94a3b8}.nav button.on{color:#2563eb;font-weight:700}
-.avatar{width:64px;height:64px;border-radius:50%;background:#2563eb;color:#fff;display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:800}
-.botrow{display:flex;gap:12px;align-items:center}.boticon{width:52px;height:52px;background:#2563eb;border-radius:12px;color:#fff;display:flex;align-items:center;justify-content:center;font-size:22px}
-.keycard{border:1px solid #e2e8f0;border-radius:14px;padding:12px;margin-top:12px}.keycode{color:#2563eb;font-weight:800}
-.badge{font-size:10px;padding:3px 8px;border-radius:999px;background:#fef3c7}.badge.red{background:#fee2e2;color:#dc2626}
-.smallbtn{padding:8px 12px;border-radius:999px;border:1px solid #e2e8f0;background:#fff;cursor:pointer}
-.del{background:#dc2626;color:#fff;border:none}
-.modal{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;align-items:flex-end;justify-content:center;z-index:10}
-.modal.open{display:flex}.sheet{background:#fff;width:100%;border-radius:20px 20px 0 0;padding:20px;max-height:85vh;overflow:auto}
-.shopnum{display:flex;align-items:center;justify-content:center;gap:16px}.shopnum button{width:36px;height:36px;border-radius:10px;border:1px solid #e2e8f0;background:#fff;font-size:20px}
-.bank{background:#0b1220;color:#fff;border-radius:16px;padding:16px;margin-top:14px}.bank b{color:#60a5fa}
-.wa{background:#e7f9ee;border:1px solid #bbf7d0;border-radius:12px;padding:12px;display:flex;gap:10px;align-items:center;margin-top:12px}
+.stat{background:#fff;border-radius:20px;padding:16px;box-shadow:0 4px 16px rgba(0,0,0,.04);border:1px solid #f1f5f9;transition:.2s}
+.stat b{font-size:28px}.stat p{font-size:10px;letter-spacing:1px;color:#64748b;margin:6px 0 0;font-weight:600}
+input,select{width:100%;padding:14px;border-radius:14px;border:1.5px solid #e2e8f0;background:#f8fafc;margin:6px 0 12px;font-size:14px;outline:none;transition:.2s}
+input:focus,select:focus{border-color:#2563eb;background:#fff;box-shadow:0 0 0 4px rgba(37,99,235,.1)}
+label{font-size:13px;font-weight:700;color:#334155}
+.nav{position:fixed;bottom:0;left:0;right:0;background:rgba(255,255,255,.95);backdrop-filter:blur(16px);display:flex;border-top:1px solid #e2e8f0;padding:8px 4px calc(10px + env(safe-area-inset-bottom));z-index:30}
+.nav button{flex:1;background:none;border:none;font-size:11px;color:#94a3b8;cursor:pointer;padding:6px 2px;border-radius:12px}
+.nav button.on{color:#2563eb;font-weight:800;background:#eff6ff}
+.avatar{width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,#2563eb,#0ea5e9);color:#fff;display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:800;box-shadow:0 6px 16px rgba(37,99,235,.3)}
+.botrow{display:flex;gap:12px;align-items:center}.boticon{width:52px;height:52px;background:linear-gradient(135deg,#2563eb,#0ea5e9);border-radius:14px;color:#fff;display:flex;align-items:center;justify-content:center;font-size:22px}
+.keycard{border:1px solid #e2e8f0;border-radius:16px;padding:14px;margin-top:12px;background:#f8fafc}.keycode{color:#2563eb;font-weight:800;font-size:15px;letter-spacing:.5px}
+.badge{font-size:10px;padding:4px 10px;border-radius:999px;background:#fef3c7;font-weight:700}.badge.red{background:#fee2e2;color:#dc2626}.badge.green{background:#dcfce7;color:#166534}
+.smallbtn{padding:10px 12px;border-radius:999px;border:1px solid #e2e8f0;background:#fff;cursor:pointer;font-weight:600}
+.del{background:#fef2f2;color:#dc2626;border-color:#fecaca}
+.modal{position:fixed;inset:0;background:rgba(15,23,42,.55);backdrop-filter:blur(4px);display:none;align-items:flex-end;justify-content:center;z-index:50}
+.modal.open{display:flex;animation:slideUp .25s ease}.sheet{background:#fff;width:100%;border-radius:24px 24px 0 0;padding:20px 20px 28px;max-height:88vh;overflow:auto}
+.shopnum{display:flex;align-items:center;justify-content:center;gap:18px}.shopnum button{width:40px;height:40px;border-radius:12px;border:1px solid #e2e8f0;background:#fff;font-size:22px;cursor:pointer}
+.bank{background:linear-gradient(135deg,#0f172a,#1e293b);color:#fff;border-radius:18px;padding:18px;margin-top:14px}.bank b{color:#60a5fa}
+.wa{background:#e7f9ee;border:1px solid #bbf7d0;border-radius:14px;padding:12px;display:flex;gap:10px;align-items:center;margin-top:12px}
 .hidden{display:none}
+.refreshBar{text-align:center;font-size:12px;color:#94a3b8;padding:8px}
+.skeleton{height:16px;background:linear-gradient(90deg,#e2e8f0 25%,#f1f5f9 50%,#e2e8f0 75%);background-size:200px 100%;animation:shimmer 1.2s infinite;border-radius:8px}
+.pill{display:inline-flex;align-items:center;gap:6px;background:#dcfce7;color:#166534;padding:5px 10px;border-radius:999px;font-size:11px;font-weight:700}
+.hostCard{border:1px solid #e2e8f0;border-radius:18px;padding:16px;margin:12px 16px;background:#fff;box-shadow:0 4px 16px rgba(0,0,0,.04)}
+.toast{position:fixed;top:16px;left:50%;transform:translateX(-50%);background:#0f172a;color:#fff;padding:12px 18px;border-radius:999px;font-size:13px;font-weight:600;z-index:100;display:none;box-shadow:0 10px 30px rgba(0,0,0,.3)}
 </style></head>
 <body>
-
-<div class="top"><b>Ambient Host <span>EA</span></b><span style="cursor:pointer" onclick="show('signin')">↗ Sign in</span></div>
+<div id="toast" class="toast"></div>
+<div class="top"><div class="logo"><div class="logoIcon">A</div><b>Ambient Host <span style="color:#2563eb">EA</span></b></div><span style="font-size:12px;color:#64748b"><span class="liveDot"></span> Cloud Live</span></div>
 
 <!-- LANDING -->
-<div id="page-landing">
+<div id="page-landing" class="page">
 <div class="hero">
 <small>● INSTITUTIONAL TRADING INFRASTRUCTURE • ZAR</small>
-<h1>Quiet precision for<br><i>serious traders.</i></h1>
-<p>Ambient Host EA turns your phone into a 24/7 EA hosting environment - like Gizmo Pro. Run your automated forex robot without keeping your PC on, without a VPS.</p>
+<h1>Your EA, running<br><i>even when you sleep.</i></h1>
+<p>Ambient turns your phone into a 24/7 hosting cloud - like Gizmo Pro. No PC on. No VPS. Just connect MT4/MT5 and go live.</p>
 <button class="btn btn-blue btn-block" onclick="show('signup')">↗ Open an account</button><br><br>
-<div style="display:flex;gap:8px"><button class="btn btn-white" style="flex:1">↓ Download Android</button><button class="btn btn-white" style="flex:1" onclick="show('signin')">Sign in →</button></div><br>
-<button class="btn btn-blue btn-block" onclick="show('openbrowser')">↗ Open in browser (iOS & Web)</button>
-<div style="display:flex;justify-content:space-between;margin-top:16px;color:#64748b;font-size:12px"><span><b style="color:#000">24/7 Cloud</b><br>hosting</span><span><b style="color:#000">MT4 • MT5</b><br>native</span><span><b style="color:#000">No VPS</b><br>needed</span></div>
+<div style="display:flex;gap:8px"><button class="btn btn-ghost" style="flex:1" onclick="showToast('Android build coming soon')">↓ Download Android</button><button class="btn btn-ghost" style="flex:1" onclick="show('signin')">Sign in →</button></div><br>
+<button class="btn btn-white btn-block" onclick="show('openbrowser')">☁️ Open in browser (iOS & Web)</button>
+<div style="display:flex;justify-content:space-between;margin-top:20px;font-size:12px;color:#cbd5e1;text-align:center"><span><b style="color:#fff;font-size:16px">24/7</b><br>Cloud Hosting</span><span><b style="color:#fff;font-size:16px">MT4 • MT5</b><br>Native</span><span><b style="color:#fff;font-size:16px">R500</b><br>Lifetime</span></div>
 </div>
-<div class="card"><b>☁️ Cloud Hosting - Like Gizmo Pro</b><p style="color:#64748b;font-size:13px">Connect your MT4/MT5 login, start hosting, close your phone. Your EA keeps trading 24/7 on Ambient Cloud.</p></div>
-<div class="card"><b>Mentor-curated EAs</b><p style="color:#64748b;font-size:13px">Hand-tuned MQL strategies, synchronised for institutional-grade execution.</p></div>
-<div class="card"><b>Sniper AI scanner</b><p style="color:#64748b;font-size:13px">Multi-timeframe analysis grounded in 43 structural setups — no guesswork, no noise.</p></div>
-<div class="card"><b>PLANS</b><h2 style="margin:4px 0">Simple pricing. <i style="color:#2563eb;font-family:serif">Serious tools.</i></h2>
-<p><b>Student</b><br><span style="font-size:28px;font-weight:800">R299</span> <small>per month • per key • 24/7 hosting included</small></p>
-<p style="font-size:13px">✓ 1 active bot - hosted 24/7<br>✓ Cloud hosting - No PC, No VPS<br>✓ Sniper AI scanner (43 strategies)<br>✓ Wick-entry signals + TP/SL<br>✓ WhatsApp mentor support</p>
-<button class="btn btn-blue" onclick="show('signup')">Get a key →</button><hr>
-<p><b>Mentor</b> <span style="background:#2563eb;color:#fff;font-size:10px;padding:3px 8px;border-radius:99px">MOST POPULAR</span><br><span style="font-size:28px;font-weight:800">R1 499</span> <small>per month • per account</small></p>
-<p style="font-size:13px">✓ Unlimited bot builds (MQL4/MQL5)<br>✓ Issue & manage student keys<br>✓ Host your students' EAs 24/7<br>✓ Payment proof workflow<br>✓ Mentor dashboard + analytics</p>
-<button class="btn btn-blue" onclick="show('signup')">Open mentor account →</button></div>
-<div class="card"><b>HOW CLOUD HOSTING WORKS</b><h3>Like Gizmo Pro - 3 steps.</h3>
-<p><b>1 • Get your AHE Key</b><br><span style="color:#64748b;font-size:13px">Your mentor approves you and sends a AHE key via WhatsApp.</span></p>
-<p><b>2 • Connect MT4 / MT5</b><br><span style="color:#64748b;font-size:13px">In Console → Hosting, enter your MT Login, Password and Server. No need to install anything.</span></p>
-<p><b>3 • Start Hosting - Close your phone</b><br><span style="color:#64748b;font-size:13px">Tap Start Hosting 24/7. Your EA runs on Ambient Cloud even when your phone is off. No PC, No VPS.</span></p></div>
+<div style="padding:4px 16px;font-size:12px;color:#64748b;display:flex;justify-content:space-between"><span><span class="liveDot"></span> <span id="landingLive">Checking cloud...</span></span><span id="landingTime"></span></div>
+<div class="card"><b>☁️ Cloud Hosting - Like Gizmo Pro</b><p style="color:#64748b;font-size:13px;line-height:1.5">Connect your MT4/MT5 login, tap Start Hosting, close your phone. Your EA keeps trading on Ambient Cloud.</p><button class="btn btn-blue" onclick="show('signup')">Start Hosting →</button></div>
+<div class="card"><b>📈 Sniper AI Scanner</b><p style="color:#64748b;font-size:13px">43 structural setups, multi-timeframe, wick-entry + TP/SL. No guesswork, no noise.</p></div>
+<div class="card"><b>PLANS</b><h2 style="margin:4px 0">Simple pricing. <i style="color:#2563eb;font-family:Georgia,serif">Serious tools.</i></h2>
+<div style="background:#f8fafc;border-radius:14px;padding:14px;margin:10px 0"><b>Student</b><br><span style="font-size:28px;font-weight:800">R299</span> <small>/ month • 24/7 hosting</small><p style="font-size:13px;line-height:1.6;color:#475569">✓ 1 bot hosted 24/7<br>✓ No PC, No VPS<br>✓ Sniper AI scanner<br>✓ WhatsApp mentor support</p><button class="btn btn-blue" onclick="show('signup')">Get a key →</button></div>
+<div style="background:#eff6ff;border:1.5px solid #bfdbfe;border-radius:14px;padding:14px"><b>Mentor</b> <span style="background:#2563eb;color:#fff;font-size:10px;padding:3px 8px;border-radius:99px">MOST POPULAR</span><br><span style="font-size:28px;font-weight:800">R1 499</span> <small>/ month</small><p style="font-size:13px;line-height:1.6;color:#475569">✓ Unlimited bot builds<br>✓ Issue student keys<br>✓ Host students 24/7<br>✓ Mentor dashboard</p><button class="btn btn-blue" onclick="show('signup')">Open mentor account →</button></div></div>
+<div class="card"><b>HOW IT WORKS</b><p><b>1 • Get AHE Key</b><br><span style="color:#64748b;font-size:13px">Mentor sends you a key on WhatsApp.</span></p><p><b>2 • Connect MT4 / MT5</b><br><span style="color:#64748b;font-size:13px">Console → Hosting → Enter Login, Password, Server.</span></p><p><b>3 • Start Hosting → Close Phone</b><br><span style="color:#64748b;font-size:13px">EA runs on Ambient Cloud 24/7. No PC, No VPS.</span></p></div>
 </div>
 
 <!-- SIGN IN -->
-<div id="page-signin" class="hidden" style="background:#eef4ff;min-height:100vh;padding:20px 16px">
-<div style="padding:20px 0 10px"><a href="#" onclick="show('landing');return false" style="color:#475569;text-decoration:none;font-size:15px">← &nbsp;Back</a></div>
-<div style="background:#fff;border-radius:20px;padding:26px 20px;max-width:420px;margin:20px auto;box-shadow:0 4px 20px rgba(0,0,0,.06)">
-<div style="display:flex;gap:12px;align-items:center">
-<div style="width:52px;height:52px;background:#0b1220;color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:14px;text-align:center;line-height:1">A<br><span style="font-size:7px;letter-spacing:1px">AMBIENT</span></div>
-<div><h2 style="margin:0;font-size:26px;font-family:serif">Welcome back</h2><p style="margin:2px 0 0;color:#64748b;font-size:14px">Login to Ambient Host EA</p></div>
-</div><br>
-<label style="font-weight:700">Email</label><input id="siEmail" type="email" style="background:#fff">
-<label style="font-weight:700">Password</label><input id="siPass" type="password" style="background:#fff">
+<div id="page-signin" class="hidden page" style="padding:20px 16px">
+<div><a href="#" onclick="show('landing');return false" style="color:#475569">← Back</a></div>
+<div style="background:#fff;border-radius:24px;padding:26px 20px;max-width:420px;margin:18px auto;box-shadow:0 10px 30px rgba(0,0,0,.08)">
+<div style="display:flex;gap:12px;align-items:center"><div style="width:52px;height:52px;background:#0f172a;color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900">A</div><div><h2 style="margin:0;font-size:26px;font-family:Georgia,serif">Welcome back</h2><p style="margin:2px 0 0;color:#64748b;font-size:14px">Login to Ambient Host EA</p></div></div><br>
+<label>Email</label><input id="siEmail" type="email" placeholder="you@example.com">
+<label>Password</label><input id="siPass" type="password" placeholder="••••••••">
 <button class="btn btn-blue btn-block" style="padding:15px;font-size:16px" onclick="doSignIn()">Login</button>
-<p style="text-align:center;font-size:13px;color:#64748b">Don't have an account? <a href="#" style="color:#2563eb;text-decoration:none;font-weight:600" onclick="show('signup');return false">Get started</a></p>
-<p style="text-align:center;font-size:12px;color:#94a3b8" id="siHint"></p>
+<p style="text-align:center;font-size:13px;color:#64748b">Don't have an account? <a href="#" onclick="show('signup');return false"><b>Get started</b></a></p>
+<p style="text-align:center;font-size:12px;color:#94a3b8" id="siHint">Login works on any phone - REAL server</p>
 </div></div>
 
-<!-- CREATE ACCOUNT -->
-<div id="page-signup" class="hidden" style="background:#eef4ff;min-height:100vh;padding:20px 16px">
-<div style="padding:20px 0 10px"><a href="#" onclick="show('landing');return false" style="color:#475569;text-decoration:none;font-size:15px">← &nbsp;Back</a></div>
-<div style="background:#fff;border-radius:20px;padding:26px 20px;max-width:420px;margin:20px auto;box-shadow:0 4px 20px rgba(0,0,0,.06)">
-<div style="display:flex;gap:12px;align-items:center">
-<div style="width:52px;height:52px;background:#0b1220;color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:14px;text-align:center;line-height:1">A<br><span style="font-size:7px;letter-spacing:1px">AMBIENT</span></div>
-<div><h2 style="margin:0;font-size:26px;font-family:serif">Get started</h2><p style="margin:2px 0 0;color:#64748b;font-size:14px">Create your Ambient Host EA account</p></div>
-</div><br>
-<label style="font-weight:700">Display name</label><input id="suName" style="background:#fff">
-<label style="font-weight:700">Email</label><input id="suEmail" type="email" style="background:#fff">
-<label style="font-weight:700">Phone / WhatsApp</label><input id="suPhone" style="background:#fff">
-<label style="font-weight:700">Password</label><input id="suPass" type="password" style="background:#fff">
-<label style="font-weight:700">Account type</label><select id="suType" style="background:#fff"><option value="Mentor">Mentor - R1 499 / month</option><option value="Student">Student - R299 / month</option></select>
+<!-- SIGNUP -->
+<div id="page-signup" class="hidden page" style="padding:20px 16px">
+<div><a href="#" onclick="show('landing');return false" style="color:#475569">← Back</a></div>
+<div style="background:#fff;border-radius:24px;padding:26px 20px;max-width:420px;margin:18px auto;box-shadow:0 10px 30px rgba(0,0,0,.08)">
+<div style="display:flex;gap:12px;align-items:center"><div style="width:52px;height:52px;background:#0f172a;color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900">A</div><div><h2 style="margin:0;font-size:26px;font-family:Georgia,serif">Get started</h2><p style="margin:2px 0 0;color:#64748b;font-size:14px">Create your account</p></div></div><br>
+<label>Display name</label><input id="suName" placeholder="Your name">
+<label>Email</label><input id="suEmail" type="email" placeholder="you@example.com">
+<label>Phone / WhatsApp</label><input id="suPhone" placeholder="073...">
+<label>Password</label><input id="suPass" type="password" placeholder="Choose password">
+<label>Account type</label><select id="suType"><option value="Mentor">Mentor - R1 499 / month</option><option value="Student">Student - R299 / month</option></select>
 <button class="btn btn-blue btn-block" style="padding:15px;font-size:16px" onclick="doSignUp()">Create account</button>
-<p style="text-align:center;font-size:13px;color:#64748b">Already have an account? <a href="#" style="color:#2563eb;text-decoration:none;font-weight:600" onclick="show('signin');return false">Login</a></p>
+<p style="text-align:center;font-size:13px;color:#64748b">Already have an account? <a href="#" onclick="show('signin');return false"><b>Login</b></a></p>
 </div></div>
 
-<!-- OPEN IN BROWSER -->
-<div id="page-openbrowser" class="hidden" style="background:#020617;min-height:100vh;padding:20px 16px;color:#fff">
-<div style="padding:20px 0 10px"><a href="#" onclick="show('landing');return false" style="color:#94a3b8;text-decoration:none;font-size:15px">← &nbsp;Back</a></div>
-<div style="background:#0f172a;border:1px solid #1e293b;border-radius:20px;padding:26px 20px;max-width:420px;margin:20px auto;text-align:center">
-<div style="width:72px;height:72px;background:#000;color:#fff;border-radius:8px;margin:0 auto;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:18px;line-height:1">A<br><span style="font-size:8px;letter-spacing:1px">AMBIENT</span></div>
-<h2 style="margin:16px 0 4px;font-size:22px">Open Ambient Host EA</h2>
-<p style="color:#94a3b8;font-size:13px;margin:4px 0">Lifetime app access • One-time R500 per email • 24/7 Hosting</p>
-<p style="color:#94a3b8;font-size:13px;line-height:1.5;margin:8px 0 20px">Pay by TymeBank transfer, then submit your application. The owner will approve once your proof is received.</p>
+<!-- OPEN BROWSER -->
+<div id="page-openbrowser" class="hidden page" style="background:#020617;min-height:100vh;padding:20px 16px;color:#fff;margin:-0px">
+<div><a href="#" onclick="show('landing');return false" style="color:#94a3b8">← Back</a></div>
+<div style="background:#0f172a;border:1px solid #1e293b;border-radius:24px;padding:26px 20px;max-width:420px;margin:18px auto;text-align:center">
+<div style="width:72px;height:72px;background:#000;color:#fff;border-radius:16px;margin:0 auto;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:22px">A</div>
+<h2 style="margin:16px 0 4px">Open Ambient Host EA</h2><p style="color:#94a3b8;font-size:13px">Lifetime • One-time R500 • 24/7 Hosting</p>
 <input id="obEmail" type="email" placeholder="you@example.com" style="background:#020617;border:1px solid #1e293b;color:#fff">
 <input id="obMentor" placeholder="MT - 1234" style="background:#020617;border:1px solid #1e293b;color:#fff">
-<input id="obPartner" placeholder="AH-XXXXXX (partner code - optional)" style="background:#020617;border:1px solid #1e293b;color:#fff">
-<p style="text-align:left;font-size:11px;color:#64748b;margin:0 0 14px">Referred by a Ambient Host EA partner? Enter their code.</p>
-<button class="btn btn-blue btn-block" style="padding:15px;font-size:16px;background:#0ea5e9" onclick="doActivate()">Activate</button>
-<div id="obBank" class="hidden" style="text-align:left;background:#020617;border:1px solid #1e293b;border-radius:12px;padding:14px;margin-top:16px">
-<b style="font-size:14px">AMBIENT HOST EA - PAY R500</b>
-<p style="font-size:13px;color:#94a3b8">🏦 Bank: <b style="color:#fff">TymeBank</b><br>💳 Account: <b style="color:#fff">51107457045</b><br>📝 Reference: <b style="color:#fff" id="obRef">MT-1234</b><br>💰 Amount: <b style="color:#fff">R500</b></p>
-<button class="btn btn-blue btn-block" onclick="sendProofOpen()">✉️ I've sent proof on WhatsApp</button>
-<p style="font-size:12px;color:#64748b;text-align:center">Owner approves in console after proof.</p>
-</div></div></div>
+<input id="obPartner" placeholder="AH-XXXXXX (optional)" style="background:#020617;border:1px solid #1e293b;color:#fff">
+<button class="btn btn-blue btn-block" style="padding:15px;background:linear-gradient(135deg,#0ea5e9,#2563eb)" onclick="doActivate()">Activate</button>
+<div id="obBank" class="hidden" style="text-align:left;background:#020617;border:1px solid #1e293b;border-radius:14px;padding:14px;margin-top:16px">
+<b>AMBIENT HOST EA - PAY R500</b><p style="font-size:13px;color:#94a3b8;line-height:1.7">🏦 TymeBank<br>💳 <b style="color:#fff">51107457045</b><br>📝 Ref: <b style="color:#fff" id="obRef">MT-1234</b><br>💰 <b style="color:#fff">R500</b></p>
+<button class="btn btn-blue btn-block" onclick="sendProofOpen()">✉️ I've sent proof on WhatsApp</button></div>
+</div></div>
 
 <!-- CONSOLE -->
-<div id="page-console" class="hidden">
-<div style="padding:16px"><small style="color:#2563eb;letter-spacing:2px;font-weight:700">MENTOR CONSOLE • CLOUD HOSTING</small><h2 style="margin:4px 0;font-size:26px">Welcome back<span id="welcomeName"></span></h2><span style="background:#dbeafe;color:#2563eb;padding:4px 10px;border-radius:99px;font-size:12px" id="mentorId">MT-9994</span> <span id="userEmailShow" style="font-size:12px;color:#64748b"></span><br><br><button class="btn btn-white" onclick="doLogout()">Sign out</button></div>
+<div id="page-console" class="hidden page">
+<div style="padding:16px"><div style="display:flex;justify-content:space-between;align-items:center"><div><small style="color:#2563eb;letter-spacing:2px;font-weight:700">MENTOR CONSOLE • CLOUD</small><h2 style="margin:4px 0;font-size:26px">Welcome back<span id="welcomeName"></span></h2></div><button class="btn btn-white" onclick="doRefresh()" style="padding:8px 14px;font-size:13px">↻ Refresh</button></div>
+<span style="background:#dbeafe;color:#2563eb;padding:5px 11px;border-radius:99px;font-size:12px;font-weight:700" id="mentorId">MT-9994</span> <span id="userEmailShow" style="font-size:12px;color:#64748b"></span> <span class="pill"><span class="liveDot"></span> Cloud Online</span><br><br>
+<button class="btn btn-white" onclick="doLogout()">Sign out</button><span style="font-size:12px;color:#94a3b8;margin-left:10px" id="lastSync">Last sync: just now</span></div>
+<div class="refreshBar" id="refreshBar">↓ Pull to refresh • Auto-refresh every 5s</div>
 
 <div id="tab-overview">
 <div class="grid">
-<div class="stat">🔑<br><b id="stockNum">0</b><p>STOCK KEYS AVAILABLE</p><a href="#" onclick="tab('shop')">Top up in Key Shop</a></div>
+<div class="stat">🔑<br><b id="stockNum">0</b><p>STOCK KEYS</p><a href="#" onclick="tab('shop')">Top up →</a></div>
 <div class="stat">📈<br><b id="activeNum">0</b><p>ACTIVE / ISSUED</p></div>
 <div class="stat">👥<br><b id="studNum">0</b><p>STUDENTS</p></div>
 <div class="stat">🤖<br><b id="botNum">0</b><p>BOTS CURATED</p></div>
-<div class="stat">☁️<br><b id="liveNum">0</b><p>LIVE HOSTING SESSIONS</p><a href="#" onclick="tab('host')">Open Hosting →</a></div>
+<div class="stat" style="grid-column:span 2;background:linear-gradient(135deg,#0f172a,#2563eb);color:#fff">☁️ <b id="liveNum" style="color:#fff">0</b><p style="color:#bfdbfe">LIVE HOSTING SESSIONS • 24/7</p><button class="btn btn-white" style="margin-top:8px;padding:8px 14px;font-size:13px" onclick="tab('host')">▶ Start Hosting</button></div>
 </div>
-<div class="card"><b>☁️ Ambient Cloud - ONLINE</b><p style="color:#64748b;font-size:13px">Your EAs keep running 24/7 even when your phone is off. No PC, No VPS - like Gizmo Pro.</p><button class="btn btn-blue" onclick="tab('host')">▶ Start Hosting</button></div>
-<div class="card"><b>Students using your mentor ID</b><p style="color:#64748b;font-size:13px">Latest access requests routed to your desk.</p><div style="display:flex;justify-content:space-between"><span id="studEmail">No students yet</span><span style="background:#dcfce7;padding:4px 10px;border-radius:99px;font-size:11px">ALLOWED</span></div></div>
+<div class="card"><b>☁️ Ambient Cloud - <span style="color:#16a34a">ONLINE</span></b><p style="color:#64748b;font-size:13px">Your EAs keep running even when your phone is off. <span id="uptimeLive">Uptime: 99.9%</span></p><button class="btn btn-blue" onclick="tab('host')">▶ Open Hosting</button></div>
 </div>
 
 <div id="tab-profile" class="hidden">
 <div style="padding:0 16px"><h2>Profile</h2><p style="color:#64748b">Your mentor identity.</p></div>
-<div class="card"><div style="display:flex;gap:12px;align-items:center"><div class="avatar" id="avatarLetter">?</div><div><button class="btn btn-white">↑ Upload avatar</button><br><small style="color:#2563eb" id="profId">MT-9994</small></div></div>
-<label>Display name</label><input id="inDisp" value="" placeholder="Enter display name">
-<label>Username</label><input id="inUser" value="" placeholder="Enter username">
-<label>Email</label><input id="inEmail" value="" placeholder="Enter email">
-<label>Phone</label><input id="inPhone" value="" placeholder="Enter phone">
-<button class="btn btn-blue" onclick="saveProfile()">Save changes</button></div>
+<div class="card"><div style="display:flex;gap:12px;align-items:center"><div class="avatar" id="avatarLetter">?</div><div><button class="btn btn-white">↑ Upload avatar</button><br><small style="color:#2563eb;font-weight:700" id="profId">MT-9994</small></div></div>
+<label>Display name</label><input id="inDisp" placeholder="Enter display name"><label>Username</label><input id="inUser" placeholder="Enter username"><label>Email</label><input id="inEmail" placeholder="Enter email"><label>Phone</label><input id="inPhone" placeholder="Enter phone"><button class="btn btn-blue" onclick="saveProfile()">Save changes</button></div>
 </div>
 
 <div id="tab-ea" class="hidden">
 <div style="display:flex;justify-content:space-between;padding:0 16px;align-items:center"><div><h2 style="margin:0">EA Manager</h2><p style="color:#64748b;margin:4px 0">Build and manage your bots.</p></div><button class="btn btn-blue" onclick="openBot()">+ Create</button></div>
-<div id="botList"></div>
-<div class="card" id="noBot" style="text-align:center;color:#64748b">No bots yet — create your first.</div>
+<div id="botList"></div><div class="card" id="noBot" style="text-align:center;color:#64748b">No bots yet — create your first.</div>
 </div>
 
 <div id="tab-keys" class="hidden">
 <div style="display:flex;justify-content:space-between;padding:0 16px;align-items:center"><div><h2 style="margin:0">Generate Keys</h2><p style="color:#64748b;margin:4px 0">Stock: <b style="color:#2563eb" id="stock2">0</b> • <span id="genCount">0</span> generated • <span id="actCount">0</span> activated</p></div><button class="btn btn-blue" onclick="openKey()">+ Generate Key</button></div>
-<div class="card" id="keyList"><p style="text-align:center;color:#64748b">No keys generated yet.</p></div>
+<div class="card" id="keyList"><div class="skeleton"></div><br><div class="skeleton" style="width:70%"></div></div>
 </div>
 
 <div id="tab-shop" class="hidden">
-<div style="text-align:center"><h2>Key Shop</h2><p style="color:#64748b">Stock available: <b style="color:#2563eb" id="stock3">0</b></p></div>
-<div class="card" style="text-align:center"><div style="width:70px;height:70px;background:#000;color:#fff;border-radius:50%;margin:0 auto;display:flex;align-items:center;justify-content:center;font-weight:900">A<br>AMBIENT</div><p>PER KEY</p><h1 style="color:#2563eb;margin:0">R100</h1><br>
-<div class="shopnum"><button onclick="chg(-1)">−</button><b id="qty" style="font-size:22px">1</b><button onclick="chg(1)">+</button></div><p>Total: <b id="total">R100</b></p>
-<div class="bank"><b style="font-size:18px">AMBIENT HOST EA<br>BANKING DETAILS</b><p style="font-size:12px;color:#94a3b8">Please use the following banking details for any payments made to Ambient Host EA.</p><p>🏦 NAME OF BANK<br><b>TymeBank</b></p><p>💳 ACCOUNT NUMBER<br><b>51107457045</b></p><p>⏱ PLEASE USE IMMEDIATE PAYMENT TO FASTEN THE PROCESS</p></div>
+<div style="text-align:center"><h2>Key Shop</h2><p style="color:#64748b">Stock: <b style="color:#2563eb" id="stock3">0</b></p></div>
+<div class="card" style="text-align:center"><div style="width:70px;height:70px;background:#0f172a;color:#fff;border-radius:50%;margin:0 auto;display:flex;align-items:center;justify-content:center;font-weight:900">A</div><p>PER KEY</p><h1 style="color:#2563eb;margin:0;font-size:36px">R100</h1><br>
+<div class="shopnum"><button onclick="chg(-1)">−</button><b id="qty" style="font-size:24px">1</b><button onclick="chg(1)">+</button></div><p>Total: <b id="total">R100</b></p>
+<div class="bank"><b style="font-size:18px">AMBIENT HOST EA<br>BANKING DETAILS</b><p style="font-size:12px;color:#94a3b8">Please use the following banking details for any payments.</p><p>🏦 TymeBank<br>💳 <b>51107457045</b><br>⏱ Use IMMEDIATE PAYMENT</p></div>
 <p style="text-align:left"><b>AMOUNT</b> <span style="color:#2563eb" id="amt2">R100</span> &nbsp; <b>REFERENCE</b> <span id="ref2">MT-9994-KEYS-1</span></p>
 <div class="wa"><span style="font-size:22px">🟢</span><div><b>Send proof on WhatsApp</b><br>+27 73 081 9637</div></div>
-<p style="font-size:13px;color:#64748b;text-align:left">Send proof of your TymeBank <span id="amt3">R100</span> transfer on WhatsApp. The owner will add <span id="qty2">1</span> stock keys to your shop.</p>
+<p style="font-size:13px;color:#64748b;text-align:left">Send proof of TymeBank <span id="amt3">R100</span> transfer. Owner will add <span id="qty2">1</span> keys.</p>
 <button class="btn btn-blue btn-block" onclick="sentProof()">✉️ I've sent the proof</button>
 </div></div>
 
-<!-- HOSTING - GIZMO PRO STYLE -->
 <div id="tab-host" class="hidden">
-<div style="padding:0 16px"><h2>☁️ Cloud Hosting</h2><p style="color:#64748b">Run your EA 24/7 - No PC, No VPS. Just like Gizmo Pro.</p>
-<div style="background:#dcfce7;border:1px solid #bbf7d0;border-radius:12px;padding:12px;font-size:13px">🟢 <b>Ambient Cloud - ONLINE</b><br>Your EA keeps running even when your phone is off.</div>
-</div>
-<div class="card">
-<b>Start New Hosting Session</b><br><br>
+<div style="padding:0 16px"><h2>☁️ Cloud Hosting</h2><p style="color:#64748b">Run your EA 24/7 - No PC, No VPS. Like Gizmo Pro.</p>
+<div style="background:#dcfce7;border:1px solid #bbf7d0;border-radius:14px;padding:12px;font-size:13px"><span class="liveDot"></span> <b>Ambient Cloud - ONLINE</b> • <span id="hostUptime">Uptime 99.9% • Ping 24ms</span></div></div>
+<div class="card"><b>Start New Hosting Session</b><br><br>
 <label>Your AHE Key</label><input id="hKey" placeholder="AHE-XXX-XXX-XXX">
 <label>MT4 / MT5 Login</label><input id="hLogin" placeholder="e.g. 12345678">
 <label>MT4 / MT5 Password</label><input id="hPass" type="password" placeholder="Investor / Master password">
-<label>MT Server</label><input id="hServer" placeholder="e.g. Deriv-Server, Exness-MT5Real">
+<label>MT Server</label><input id="hServer" placeholder="e.g. Deriv-Server">
 <label>EA Name</label><input id="hEa" placeholder="e.g. Ambient Sniper EA">
 <label>Pair</label><select id="hPair"><option>XAUUSD</option><option>EURUSD</option><option>GBPUSD</option><option>USDJPY</option><option>BTCUSD</option></select>
 <button class="btn btn-blue btn-block" onclick="startHost()">▶ Start Hosting 24/7</button>
-<p style="font-size:12px;color:#64748b;text-align:center">Uses 1 Active Key • Hosting is included in your plan</p>
-</div>
-<div style="padding:0 16px"><h3>Your Live Sessions</h3></div>
+<p style="font-size:12px;color:#64748b;text-align:center">Uses 1 Active Key • Hosting included</p></div>
+<div style="padding:0 16px;display:flex;justify-content:space-between;align-items:center"><h3>Live Sessions</h3><button class="btn btn-white" style="padding:6px 12px;font-size:12px" onclick="doRefresh()">↻ Refresh</button></div>
 <div id="hostList"></div>
 </div>
-
 </div>
 
 <div class="nav" id="bottomNav" style="display:none">
@@ -194,7 +184,7 @@ label{font-size:13px;font-weight:600}
 <button onclick="tab('host')" id="n-host">☁️<br>Hosting</button>
 </div>
 
-<div class="modal" id="botModal"><div class="sheet"><div style="display:flex;justify-content:space-between"><h3>Create Bot</h3><button onclick="closeAll()">✕</button></div><button class="btn btn-white">↑ Upload image</button><br><br><label>Bot name</label><input id="botName" value="" placeholder="Enter bot name"><label>Pairs</label><div style="display:flex;gap:8px"><input id="pairIn" placeholder="e.g. XAUUSD"><button class="btn btn-white" onclick="addPair()">+</button></div><div id="pairTags"></div><div style="display:flex;justify-content:flex-end;gap:8px"><button class="btn btn-white" onclick="closeAll()">Cancel</button><button class="btn btn-blue" onclick="saveBot()">Save</button></div></div></div>
+<div class="modal" id="botModal"><div class="sheet"><div style="display:flex;justify-content:space-between"><h3>Create Bot</h3><button onclick="closeAll()">✕</button></div><button class="btn btn-white">↑ Upload image</button><br><br><label>Bot name</label><input id="botName" placeholder="Enter bot name"><label>Pairs</label><div style="display:flex;gap:8px"><input id="pairIn" placeholder="e.g. XAUUSD"><button class="btn btn-white" onclick="addPair()">+</button></div><div id="pairTags"></div><br><div style="display:flex;justify-content:flex-end;gap:8px"><button class="btn btn-white" onclick="closeAll()">Cancel</button><button class="btn btn-blue" onclick="saveBot()">Save</button></div></div></div>
 <div class="modal" id="keyModal"><div class="sheet"><div style="display:flex;justify-content:space-between"><h3>Generate new key</h3><button onclick="closeAll()">✕</button></div><label>Username</label><input id="kUser" placeholder="Enter username"><label>Email</label><input id="kEmail" placeholder="Enter email"><label>Duration</label><select id="kDays"><option value="7">7 days</option><option value="30" selected>30 days</option><option value="90">90 days</option><option value="365">1 year</option></select><label>Bot profile</label><select id="kBot"></select><button class="btn btn-blue btn-block" id="genBtn" onclick="doGen()">Generate</button></div></div>
 
 <script>
@@ -204,6 +194,8 @@ let pairs=[]; let stock=Number(localStorage.getItem('ambient_stock')||0); let qt
 let profile=JSON.parse(localStorage.getItem('ambient_profile')||'{"display":"","username":"","email":"","phone":""}');
 let account=JSON.parse(localStorage.getItem('ambient_account')||'null');
 let logged=localStorage.getItem('ambient_logged')==='1';
+let startTime=Date.now();
+function showToast(msg){let t=document.getElementById('toast');t.innerText=msg;t.style.display='block';setTimeout(()=>t.style.display='none',2500)}
 function applyProfile(){
   let name = profile.display || (account?account.name:'');
   document.getElementById('welcomeName').innerText = name ? ', '+name : '';
@@ -212,95 +204,85 @@ function applyProfile(){
   document.getElementById('inEmail').value=profile.email||(account?account.email:''); document.getElementById('inPhone').value=profile.phone||(account?account.phone:'');
   document.getElementById('userEmailShow').innerText = account?account.email:'';
 }
-function saveProfile(){
-  profile={display:document.getElementById('inDisp').value.trim(),username:document.getElementById('inUser').value.trim(),email:document.getElementById('inEmail').value.trim(),phone:document.getElementById('inPhone').value.trim()};
-  localStorage.setItem('ambient_profile',JSON.stringify(profile)); applyProfile(); alert('Saved ✓ - Welcome back, '+profile.display);
-}
+function saveProfile(){ profile={display:document.getElementById('inDisp').value.trim(),username:document.getElementById('inUser').value.trim(),email:document.getElementById('inEmail').value.trim(),phone:document.getElementById('inPhone').value.trim()}; localStorage.setItem('ambient_profile',JSON.stringify(profile)); applyProfile(); showToast('Saved ✓ Welcome back, '+profile.display); }
 function show(p){
   ['landing','signin','signup','openbrowser','console'].forEach(x=>document.getElementById('page-'+x).classList.toggle('hidden',x!==p));
   document.getElementById('bottomNav').style.display=p==='console'?'flex':'none';
   if(p==='console') tab('overview');
-  if(p==='signin'){ document.getElementById('siHint').innerText = 'Login with your REAL account - works on any phone'; }
+  if(p==='landing') checkCloud();
 }
+async function checkCloud(){ try{ let r=await fetch(API+'/health'); let d=await r.json(); document.getElementById('landingLive').innerText='Cloud Online • '+d.accounts+' users • '+d.hosts+' hosting live'; }catch(e){ document.getElementById('landingLive').innerText='Cloud connecting...'; } document.getElementById('landingTime').innerText=new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}); }
 function doSignUp(){
   let name=document.getElementById('suName').value.trim(), email=document.getElementById('suEmail').value.trim().toLowerCase(), phone=document.getElementById('suPhone').value.trim(), pass=document.getElementById('suPass').value;
   if(!name||!email||!pass) return alert('Fill name, email and password');
   fetch(API+'/auth/signup',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name,email,phone,pass,type:document.getElementById('suType').value})})
-  .then(r=>r.json().then(d=>({ok:r.ok,d})))
-  .then(({ok,d})=>{
-    if(!ok) return alert(d.error||'Signup failed');
-    account={name:d.name,email:d.email,phone:phone,pass,type:d.type,mentorId:d.mentorId};
-    localStorage.setItem('ambient_account',JSON.stringify(account));
+  .then(r=>r.json().then(d=>({ok:r.ok,d}))).then(({ok,d})=>{ if(!ok) return alert(d.error||'Signup failed');
+    account={name:d.name,email:d.email,phone:phone,pass,type:d.type,mentorId:d.mentorId}; localStorage.setItem('ambient_account',JSON.stringify(account));
     profile={display:d.name,username:d.name,email:d.email,phone}; localStorage.setItem('ambient_profile',JSON.stringify(profile));
     localStorage.setItem('ambient_logged','1'); document.getElementById('mentorId').innerText=d.mentorId; document.getElementById('profId').innerText=d.mentorId;
-    applyProfile(); alert('Account created on REAL server ✓ Welcome, '+d.name); show('console');
-  }).catch(()=>alert('Server offline - try again'));
+    applyProfile(); showToast('Account created ✓ Welcome, '+d.name); show('console'); }).catch(()=>alert('Server offline - try again'));
 }
 function doSignIn(){
   let email=document.getElementById('siEmail').value.trim().toLowerCase(), pass=document.getElementById('siPass').value;
   if(!email||!pass) return alert('Enter email + password');
   fetch(API+'/auth/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email,pass})})
-  .then(r=>r.json().then(d=>({ok:r.ok,d})))
-  .then(({ok,d})=>{
-    if(!ok) return alert(d.error||'Login failed');
-    account={name:d.name,email:d.email,phone:d.phone,pass,type:d.type,mentorId:d.mentorId};
-    localStorage.setItem('ambient_account',JSON.stringify(account));
+  .then(r=>r.json().then(d=>({ok:r.ok,d}))).then(({ok,d})=>{ if(!ok) return alert(d.error||'Login failed');
+    account={name:d.name,email:d.email,phone:d.phone,pass,type:d.type,mentorId:d.mentorId}; localStorage.setItem('ambient_account',JSON.stringify(account));
     localStorage.setItem('ambient_logged','1'); document.getElementById('mentorId').innerText=d.mentorId; document.getElementById('profId').innerText=d.mentorId;
     profile={display:d.name,username:d.name,email:d.email,phone:d.phone}; localStorage.setItem('ambient_profile',JSON.stringify(profile));
-    applyProfile(); show('console');
-  }).catch(()=>alert('Server offline - try again'));
+    applyProfile(); show('console'); }).catch(()=>alert('Server offline - try again'));
 }
 function doLogout(){ localStorage.removeItem('ambient_logged'); show('landing'); }
 function doActivate(){
-  let email=document.getElementById('obEmail').value.trim();
-  let mt=document.getElementById('obMentor').value.trim();
-  let partner=document.getElementById('obPartner').value.trim();
-  if(!email) return alert('Enter your email');
-  if(!mt) return alert('Enter your Mentor ID - e.g. MT-1234');
-  document.getElementById('obRef').innerText = mt + ' - R500';
-  document.getElementById('obBank').classList.remove('hidden');
+  let email=document.getElementById('obEmail').value.trim(); let mt=document.getElementById('obMentor').value.trim(); let partner=document.getElementById('obPartner').value.trim();
+  if(!email) return alert('Enter your email'); if(!mt) return alert('Enter your Mentor ID - e.g. MT-1234');
+  document.getElementById('obRef').innerText = mt + ' - R500'; document.getElementById('obBank').classList.remove('hidden');
   localStorage.setItem('ambient_open', JSON.stringify({email, mt, partner}));
   fetch(API+'/open/apply',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email,mt,partner})});
-  alert('Application saved on REAL server ✓ Now pay R500 to TymeBank 51107457045 and send proof');
+  showToast('Application saved ✓ Pay R500 to TymeBank');
 }
-function sendProofOpen(){
-  let o=JSON.parse(localStorage.getItem('ambient_open')||'{"email":"","mt":""}');
-  window.open('https://wa.me/27730819637?text='+encodeURIComponent('Hi, I paid R500 for Ambient Host EA Lifetime Access. Email: '+o.email+' Mentor ID: '+o.mt),'_blank');
-}
-function tab(t){['overview','profile','ea','keys','shop','host'].forEach(x=>document.getElementById('tab-'+x).classList.toggle('hidden',x!==t));['overview','profile','ea','keys','shop','host'].forEach(x=>document.getElementById('n-'+x).classList.toggle('on',x===t)); if(t==='ea') renderBots(); if(t==='keys') loadKeys(); if(t==='host') loadHosts(); if(t==='overview') loadHosts();}
+function sendProofOpen(){ let o=JSON.parse(localStorage.getItem('ambient_open')||'{"email":"","mt":""}'); window.open('https://wa.me/27730819637?text='+encodeURIComponent('Hi, I paid R500 for Ambient Host EA Lifetime Access. Email: '+o.email+' Mentor ID: '+o.mt),'_blank'); }
+function tab(t){['overview','profile','ea','keys','shop','host'].forEach(x=>document.getElementById('tab-'+x).classList.toggle('hidden',x!==t));['overview','profile','ea','keys','shop','host'].forEach(x=>document.getElementById('n-'+x).classList.toggle('on',x===t)); if(t==='ea') renderBots(); if(t==='keys') loadKeys(); if(t==='host') loadHosts(); if(t==='overview') loadHosts(); }
 function openBot(){pairs=[];renderPairs();document.getElementById('botModal').classList.add('open')}
 function addPair(){let v=document.getElementById('pairIn').value.trim().toUpperCase(); if(!v) return; pairs.push(v); document.getElementById('pairIn').value=''; renderPairs();}
 function renderPairs(){document.getElementById('pairTags').innerHTML=pairs.map(p=>`<span style="background:#e2e8f0;padding:4px 10px;border-radius:99px;margin:2px;display:inline-block">${p} ✕</span>`).join('')}
-function saveBot(){let n=document.getElementById('botName').value||'New Bot'; bots.push({name:n,pairs:pairs.length?pairs:['XAUUSD']}); localStorage.setItem('ambient_bots',JSON.stringify(bots)); closeAll(); renderBots();}
+function saveBot(){let n=document.getElementById('botName').value||'New Bot'; bots.push({name:n,pairs:pairs.length?pairs:['XAUUSD']}); localStorage.setItem('ambient_bots',JSON.stringify(bots)); closeAll(); renderBots(); showToast('Bot created ✓');}
 function renderBots(){let el=document.getElementById('botList'); document.getElementById('noBot').style.display=bots.length?'none':'block'; document.getElementById('botNum').innerText=bots.length; el.innerHTML=bots.map((b,i)=>`<div class="card"><div class="botrow"><div class="boticon">🤖</div><div><b>${b.name}</b><br><small>${b.pairs.length} pairs • ${b.pairs.join(', ')}</small></div></div><div style="display:flex;gap:8px;margin-top:12px"><button class="smallbtn" style="flex:1">✏️</button><button class="smallbtn" style="flex:1">ⓘ</button><button class="smallbtn del" style="flex:1" onclick="bots.splice(${i},1);localStorage.setItem('ambient_bots',JSON.stringify(bots));renderBots()">🗑</button></div></div>`).join(''); let sel=document.getElementById('kBot'); sel.innerHTML=bots.length?bots.map(b=>`<option>${b.name}</option>`).join(''):'<option>No bot yet - create one</option>';}
 function openKey(){if(stock<=0) return alert('No stock! Buy in Key Shop first - Stock is 0'); document.getElementById('keyModal').classList.add('open'); renderBots();}
 function closeAll(){document.querySelectorAll('.modal').forEach(m=>m.classList.remove('open'))}
 function updateStock(){['stockNum','stock2','stock3'].forEach(id=>document.getElementById(id).innerText=stock); localStorage.setItem('ambient_stock',stock);}
-async function loadKeys(){try{let r=await fetch(API+'/prime/keys'); keys=await r.json();}catch(e){keys=[]} document.getElementById('genCount').innerText=keys.length; document.getElementById('activeNum').innerText=keys.filter(k=>k.status==='ACTIVE').length; document.getElementById('actCount').innerText=keys.filter(k=>k.status==='ACTIVE').length; document.getElementById('studNum').innerText=keys.length?1:0; let el=document.getElementById('keyList'); if(!keys.length){el.innerHTML='<p style="text-align:center;color:#64748b">No keys generated yet.</p>';return} el.innerHTML=keys.map(k=>`<div class="keycard"><div style="display:flex;justify-content:space-between"><span class="keycode">${k.code}</span><span class="badge ${k.status==='INACTIVE'?'red':''}">${k.status}</span></div><p style="margin:8px 0 4px">${k.username} • ${k.email}</p><small style="color:#64748b">Bot: ${k.bot_name} • ${k.duration_days}d</small><br><div style="display:flex;gap:8px;margin-top:10px"><button class="smallbtn" style="flex:1;background:${k.status==='INACTIVE'?'#2563eb':'#fff'};color:${k.status==='INACTIVE'?'#fff':'#000'}" onclick="toggleKey('${k.id}','${k.status}')">${k.status==='INACTIVE'?'↻ Reactivate':'⊘ Deactivate'}</button><button class="smallbtn del" onclick="delKey('${k.id}')">🗑</button></div></div>`).join('');}
-async function doGen(){let btn=document.getElementById('genBtn'); btn.innerText='Generating...'; let body={username:document.getElementById('kUser').value||'',email:document.getElementById('kEmail').value||'',duration_days:Number(document.getElementById('kDays').value),bot_name:document.getElementById('kBot').value}; let r=await fetch(API+'/prime/keys/generate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)}); let d=await r.json(); stock=Math.max(0,stock-1); updateStock(); closeAll(); btn.innerText='Generate'; alert('Generated '+d.code); loadKeys();}
-async function toggleKey(id,st){let ns=st==='INACTIVE'?'UNUSED':'INACTIVE'; if(ns==='UNUSED' && !confirm('Reactivate this key? Resets to unused so the student can use it again.')) return; await fetch(API+'/prime/keys/toggle',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id,status:ns})}); alert(ns==='INACTIVE'?'Inactive':'Key reactivated'); loadKeys();}
+async function loadKeys(){try{let r=await fetch(API+'/prime/keys'); keys=await r.json();}catch(e){keys=[]} document.getElementById('genCount').innerText=keys.length; document.getElementById('activeNum').innerText=keys.filter(k=>k.status==='ACTIVE').length; document.getElementById('actCount').innerText=keys.filter(k=>k.status==='ACTIVE').length; document.getElementById('studNum').innerText=keys.length?1:0; let el=document.getElementById('keyList'); if(!keys.length){el.innerHTML='<p style="text-align:center;color:#64748b">No keys generated yet.</p>';return} el.innerHTML=keys.map(k=>`<div class="keycard"><div style="display:flex;justify-content:space-between"><span class="keycode">${k.code}</span><span class="badge ${k.status==='INACTIVE'?'red':k.status==='ACTIVE'?'green':''}">${k.status}</span></div><p style="margin:8px 0 4px">${k.username} • ${k.email}</p><small style="color:#64748b">Bot: ${k.bot_name} • ${k.duration_days}d • ${new Date(k.created).toLocaleDateString()}</small><br><div style="display:flex;gap:8px;margin-top:10px"><button class="smallbtn" style="flex:1" onclick="navigator.clipboard.writeText('${k.code}');showToast('Key copied ✓')">📋 Copy</button><button class="smallbtn" style="flex:1" onclick="toggleKey('${k.id}','${k.status}')">${k.status==='INACTIVE'?'↻ Reactivate':'⊘ Deactivate'}</button><button class="smallbtn del" onclick="delKey('${k.id}')">🗑</button></div></div>`).join('');}
+async function doGen(){let btn=document.getElementById('genBtn'); btn.innerText='Generating...'; let body={username:document.getElementById('kUser').value||'',email:document.getElementById('kEmail').value||'',duration_days:Number(document.getElementById('kDays').value),bot_name:document.getElementById('kBot').value}; let r=await fetch(API+'/prime/keys/generate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)}); let d=await r.json(); stock=Math.max(0,stock-1); updateStock(); closeAll(); btn.innerText='Generate'; showToast('Generated '+d.code); loadKeys();}
+async function toggleKey(id,st){let ns=st==='INACTIVE'?'UNUSED':'INACTIVE'; if(ns==='UNUSED' && !confirm('Reactivate this key?')) return; await fetch(API+'/prime/keys/toggle',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id,status:ns})}); showToast(ns==='INACTIVE'?'Deactivated':'Reactivated ✓'); loadKeys();}
 async function delKey(id){if(!confirm('Delete this key?')) return; await fetch(API+'/prime/keys/'+id,{method:'DELETE'}); loadKeys();}
 function chg(d){qty=Math.max(1,qty+d); document.getElementById('qty').innerText=qty; document.getElementById('qty2').innerText=qty; document.getElementById('total').innerText='R'+(qty*100); document.getElementById('amt2').innerText='R'+(qty*100); document.getElementById('amt3').innerText='R'+(qty*100); document.getElementById('ref2').innerText='MT-9994-KEYS-'+qty+' ('+qty*100+')';}
-function sentProof(){alert('Send R'+(qty*100)+' proof on WhatsApp. The owner will add '+qty+' keys to your stock.'); stock+=qty; updateStock(); window.open('https://wa.me/27730819637?text='+encodeURIComponent('Hi, I sent R'+(qty*100)+' for '+qty+' Ambient Host keys. Ref: MT-9994-KEYS-'+qty),'_blank');}
-// ===== GIZMO-STYLE HOSTING =====
+function sentProof(){showToast('Send R'+(qty*100)+' proof on WhatsApp'); stock+=qty; updateStock(); window.open('https://wa.me/27730819637?text='+encodeURIComponent('Hi, I sent R'+(qty*100)+' for '+qty+' Ambient Host keys. Ref: MT-9994-KEYS-'+qty),'_blank');}
 async function loadHosts(){
   let hosts=[]; try{ let r=await fetch(API+'/host/list'); hosts=await r.json(); }catch(e){}
   let live=document.getElementById('liveNum'); if(live) live.innerText=hosts.filter(h=>h.status==='ONLINE').length;
   let el=document.getElementById('hostList'); if(!el) return;
   if(!hosts.length){ el.innerHTML='<div class="card" style="text-align:center;color:#64748b">No hosting sessions yet.<br>Start one above - your EA will run 24/7.</div>'; return; }
-  el.innerHTML=hosts.map(h=>`<div class="card"><div style="display:flex;justify-content:space-between"><b>${h.eaName}</b><span style="background:${h.status==='ONLINE'?'#dcfce7':'#fee2e2'};padding:4px 10px;border-radius:99px;font-size:11px">${h.status} ●</span></div><p style="font-size:13px;color:#64748b;margin:8px 0">Pair: ${h.pair} • Login: ${h.mtLogin} • Server: ${h.mtServer}<br>Ping: ${h.ping} • Uptime: ${h.uptime} • Trades: ${h.trades}</p><div style="display:flex;gap:8px"><button class="smallbtn" style="flex:1" onclick="hostAction('${h.id}','restart')">↻ Restart</button><button class="smallbtn" style="flex:1" onclick="hostAction('${h.id}','stop')">⏸ Stop</button><button class="smallbtn del" style="flex:1" onclick="hostDel('${h.id}')">🗑</button></div></div>`).join('');
+  el.innerHTML=hosts.map(h=>{
+    let mins=Math.floor((Date.now()-new Date(h.started).getTime())/60000); let up=Math.floor(mins/60)+'h '+(mins%60)+'m';
+    return `<div class="hostCard"><div style="display:flex;justify-content:space-between;align-items:center"><b>${h.eaName}</b><span class="pill" style="background:${h.status==='ONLINE'?'#dcfce7':'#fee2e2'};color:${h.status==='ONLINE'?'#166534':'#991b1b'}"><span class="liveDot" style="background:${h.status==='ONLINE'?'#22c55e':'#ef4444'}"></span> ${h.status}</span></div><p style="font-size:13px;color:#64748b;margin:10px 0;line-height:1.6">Pair: <b style="color:#0f172a">${h.pair}</b> • Login: ${h.mtLogin}<br>Server: ${h.mtServer}<br>Ping: <b style="color:#16a34a">${h.ping}</b> • Uptime: <b>${up}</b> • Trades: ${h.trades}</p><div style="display:flex;gap:8px"><button class="smallbtn" style="flex:1" onclick="hostAction('${h.id}','restart')">↻ Restart</button><button class="smallbtn" style="flex:1" onclick="hostAction('${h.id}','stop')">⏸ Stop</button><button class="smallbtn del" style="flex:1" onclick="hostDel('${h.id}')">🗑</button></div></div>`
+  }).join('');
 }
 async function startHost(){
   let body={email:account?account.email:'', mtLogin:document.getElementById('hLogin').value, mtPassword:document.getElementById('hPass').value, mtServer:document.getElementById('hServer').value, eaName:document.getElementById('hEa').value, pair:document.getElementById('hPair').value, key:document.getElementById('hKey').value.trim().toUpperCase()};
   if(!body.key||!body.mtLogin||!body.mtServer) return alert('Fill Key, MT Login and MT Server');
   let r=await fetch(API+'/host/start',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
   let d=await r.json(); if(!r.ok) return alert(d.error);
-  alert('Hosting STARTED ✓ '+d.eaName+' is now ONLINE 24/7 - You can close your phone.');
-  loadHosts();
+  showToast('Hosting STARTED ✓ '+d.eaName+' ONLINE 24/7'); loadHosts();
 }
-async function hostAction(id,act){ await fetch(API+'/host/'+act,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id})}); loadHosts(); }
+async function hostAction(id,act){ await fetch(API+'/host/'+act,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id})}); showToast(act==='restart'?'Restarted ✓':'Stopped'); loadHosts(); }
 async function hostDel(id){ if(!confirm('Delete this hosting session?')) return; await fetch(API+'/host/'+id,{method:'DELETE'}); loadHosts(); }
+function doRefresh(){ showToast('Refreshing...'); document.getElementById('lastSync').innerText='Last sync: '+new Date().toLocaleTimeString(); loadKeys(); loadHosts(); checkCloud(); }
+// REAL REFRESH - auto every 5s + pull down
+setInterval(()=>{ if(!document.getElementById('page-console').classList.contains('hidden')){ loadKeys(); loadHosts(); document.getElementById('lastSync').innerText='Last sync: '+new Date().toLocaleTimeString(); } }, 5000);
+let touchY=0; document.addEventListener('touchstart',e=>{ touchY=e.touches[0].clientY; },{passive:true});
+document.addEventListener('touchend',e=>{ let dy=e.changedTouches[0].clientY-touchY; if(dy>120 && window.scrollY===0){ doRefresh(); } },{passive:true});
+setInterval(()=>{ let m=Math.floor((Date.now()-startTime)/60000); document.getElementById('uptimeLive').innerText='Uptime: 99.9% • Session '+Math.floor(m/60)+'h '+(m%60)+'m'; }, 1000);
 if(account){document.getElementById('mentorId').innerText=account.mentorId; document.getElementById('profId').innerText=account.mentorId;}
-applyProfile(); renderBots(); updateStock(); loadKeys(); loadHosts();
+applyProfile(); renderBots(); updateStock(); loadKeys(); loadHosts(); checkCloud();
 if(logged && account) show('console'); else show('landing');
 </script></body></html>
