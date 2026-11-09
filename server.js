@@ -9,7 +9,7 @@ app.use(express.static(path.join(__dirname)));
 
 // ===== PERMANENT STORAGE =====
 const DATA_FILE = path.join(__dirname, 'data.json');
-let data = { keys: [], accounts: [], opens: [], hosts: [] };
+let data = { keys: [], accounts: [], opens: [], hosts: [], orders: [] };
 try {
   if (fs.existsSync(DATA_FILE)) {
     data = JSON.parse(fs.readFileSync(DATA_FILE, 'utf8'));
@@ -17,7 +17,8 @@ try {
     if (!data.accounts) data.accounts = [];
     if (!data.opens) data.opens = [];
     if (!data.hosts) data.hosts = [];
-    console.log('Loaded permanent data:', data.keys.length, 'keys,', data.accounts.length, 'accounts,', data.hosts.length, 'hosts');
+    if (!data.orders) data.orders = [];
+    console.log('Loaded permanent data:', data.keys.length, 'keys,', data.accounts.length, 'accounts,', data.hosts.length, 'hosts,', data.orders.length, 'orders');
   }
 } catch(e) { console.log('Starting fresh DB', e.message); }
 
@@ -34,8 +35,8 @@ function genCode(){
   return `AHE-${p}-${p2}-${p3}`;
 }
 
-app.get('/', (req,res)=>res.send('Ambient Host EA API Live - Gizmo Style Hosting'));
-app.get('/health', (req,res)=>res.json({ok:true, keys: data.keys.length, accounts: data.accounts.length, hosts: data.hosts.length, opens: data.opens.length}));
+app.get('/', (req,res)=>res.send('Ambient Host EA API Live - Gizmo Style Hosting - Real Payments'));
+app.get('/health', (req,res)=>res.json({ok:true, keys: data.keys.length, accounts: data.accounts.length, hosts: data.hosts.length, opens: data.opens.length, orders: data.orders.length}));
 
 // ===== REAL AUTH - SIGNUP / LOGIN =====
 app.post('/auth/signup', (req,res)=>{
@@ -88,14 +89,12 @@ app.get('/keys/validate', (req,res)=>{
 });
 
 // ===== GIZMO-STYLE CLOUD HOSTING =====
-// Turn phone into 24/7 hosting - No PC, No VPS
 app.get('/host/list', (req,res)=>res.json(data.hosts));
 app.post('/host/start', (req,res)=>{
   const {email, mtLogin, mtPassword, mtServer, eaName, pair, key} = req.body;
   const k = data.keys.find(x=>x.code===key);
   if(!k) return res.status(400).json({error:'Invalid AHE Key - Get a key from your mentor first'});
   if(k.status==='INACTIVE') return res.status(400).json({error:'Key is INACTIVE'});
-  // Prevent duplicate hosting with same key
   const existing = data.hosts.find(h=>h.key===key && h.status==='ONLINE');
   if(existing) return res.status(400).json({error:'This key is already hosting - Stop it first'});
   const h = {id: Date.now().toString(), email: email||'', mtLogin: mtLogin||'', mtServer: mtServer||'', eaName: eaName||'Ambient EA', pair: pair||'XAUUSD', key, status:'ONLINE', uptime:'0h 0m', balance:'--', trades:0, ping:'24ms', started: new Date().toISOString()};
@@ -112,6 +111,24 @@ app.post('/host/restart', (req,res)=>{
   res.json({ok:true});
 });
 app.delete('/host/:id', (req,res)=>{ data.hosts = data.hosts.filter(x=>x.id!==req.params.id); save(); res.json({ok:true}); });
+
+// ===== REAL KEY SHOP - PENDING APPROVAL - NO FAKE TOP-UP =====
+app.post('/shop/order', (req,res)=>{
+  const {email, mentorId, qty, amount, ref} = req.body;
+  const o = {id: Date.now().toString(), email: email||'', mentorId: mentorId||'', qty: qty||1, amount: amount||100, ref: ref||'', status:'PENDING', created: new Date().toISOString()};
+  data.orders.unshift(o); save(); res.json(o);
+});
+app.get('/shop/list', (req,res)=>res.json(data.orders));
+app.post('/shop/approve', (req,res)=>{
+  const o = data.orders.find(x=>x.id===req.body.id);
+  if(!o) return res.status(404).json({error:'not found'});
+  o.status='APPROVED'; save(); res.json(o);
+});
+app.post('/shop/reject', (req,res)=>{
+  const o = data.orders.find(x=>x.id===req.body.id);
+  if(!o) return res.status(404).json({error:'not found'});
+  o.status='REJECTED'; save(); res.json(o);
+});
 
 const PORT = process.env.PORT || 10000;
 app.listen(PORT, ()=>console.log('Live on '+PORT));
