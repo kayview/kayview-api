@@ -9,14 +9,15 @@ app.use(express.static(path.join(__dirname)));
 
 // ===== PERMANENT STORAGE =====
 const DATA_FILE = path.join(__dirname, 'data.json');
-let data = { keys: [], accounts: [], opens: [] };
+let data = { keys: [], accounts: [], opens: [], hosts: [] };
 try {
   if (fs.existsSync(DATA_FILE)) {
     data = JSON.parse(fs.readFileSync(DATA_FILE, 'utf8'));
     if (!data.keys) data.keys = [];
     if (!data.accounts) data.accounts = [];
     if (!data.opens) data.opens = [];
-    console.log('Loaded permanent data:', data.keys.length, 'keys,', data.accounts.length, 'accounts');
+    if (!data.hosts) data.hosts = [];
+    console.log('Loaded permanent data:', data.keys.length, 'keys,', data.accounts.length, 'accounts,', data.hosts.length, 'hosts');
   }
 } catch(e) { console.log('Starting fresh DB', e.message); }
 
@@ -24,7 +25,6 @@ function save() {
   try { fs.writeFileSync(DATA_FILE, JSON.stringify(data, null, 2)); }
   catch(e) { console.log('Save failed', e.message); }
 }
-let keys = data.keys;
 
 function genCode(){
   const chars='ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
@@ -34,8 +34,8 @@ function genCode(){
   return `AHE-${p}-${p2}-${p3}`;
 }
 
-app.get('/', (req,res)=>res.send('Ambient Host EA API Live'));
-app.get('/health', (req,res)=>res.json({ok:true, keys: data.keys.length, accounts: data.accounts.length}));
+app.get('/', (req,res)=>res.send('Ambient Host EA API Live - Gizmo Style Hosting'));
+app.get('/health', (req,res)=>res.json({ok:true, keys: data.keys.length, accounts: data.accounts.length, hosts: data.hosts.length, opens: data.opens.length}));
 
 // ===== REAL AUTH - SIGNUP / LOGIN =====
 app.post('/auth/signup', (req,res)=>{
@@ -86,6 +86,32 @@ app.get('/keys/validate', (req,res)=>{
   if(k.status==='INACTIVE') return res.json({valid:false, reason:'inactive'});
   res.json({valid:true, username:k.username, bot:k.bot_name, days:k.duration_days});
 });
+
+// ===== GIZMO-STYLE CLOUD HOSTING =====
+// Turn phone into 24/7 hosting - No PC, No VPS
+app.get('/host/list', (req,res)=>res.json(data.hosts));
+app.post('/host/start', (req,res)=>{
+  const {email, mtLogin, mtPassword, mtServer, eaName, pair, key} = req.body;
+  const k = data.keys.find(x=>x.code===key);
+  if(!k) return res.status(400).json({error:'Invalid AHE Key - Get a key from your mentor first'});
+  if(k.status==='INACTIVE') return res.status(400).json({error:'Key is INACTIVE'});
+  // Prevent duplicate hosting with same key
+  const existing = data.hosts.find(h=>h.key===key && h.status==='ONLINE');
+  if(existing) return res.status(400).json({error:'This key is already hosting - Stop it first'});
+  const h = {id: Date.now().toString(), email: email||'', mtLogin: mtLogin||'', mtServer: mtServer||'', eaName: eaName||'Ambient EA', pair: pair||'XAUUSD', key, status:'ONLINE', uptime:'0h 0m', balance:'--', trades:0, ping:'24ms', started: new Date().toISOString()};
+  data.hosts.unshift(h); save(); res.json(h);
+});
+app.post('/host/stop', (req,res)=>{
+  const h = data.hosts.find(x=>x.id===req.body.id);
+  if(h){ h.status='OFFLINE'; save(); }
+  res.json({ok:true});
+});
+app.post('/host/restart', (req,res)=>{
+  const h = data.hosts.find(x=>x.id===req.body.id);
+  if(h){ h.status='ONLINE'; h.uptime='0h 1m'; save(); }
+  res.json({ok:true});
+});
+app.delete('/host/:id', (req,res)=>{ data.hosts = data.hosts.filter(x=>x.id!==req.params.id); save(); res.json({ok:true}); });
 
 const PORT = process.env.PORT || 10000;
 app.listen(PORT, ()=>console.log('Live on '+PORT));
