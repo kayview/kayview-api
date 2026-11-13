@@ -1,5 +1,5 @@
 name: kayview_charger
-description: AMBIENT HOST EA - KAYVIEW CHARGER - Flutter APK wrapper for web + API
+description: KAYVIEW CHARGER - Native Flutter App
 publish_to: 'none'
 version: 1.0.0+1
 
@@ -9,13 +9,11 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  webview_flutter: ^4.8.0
-  webview_flutter_android: ^3.16.0
+  http: ^1.2.0
+  url_launcher: ^6.2.0
   permission_handler: ^11.3.0
   connectivity_plus: ^6.0.3
+  flutter_overlay_window: ^0.4.0
 
 flutter:
   uses-material-design: true
-  assets:
-    - assets/index.html
-    - assets/offline.html
