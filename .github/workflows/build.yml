@@ -1,4 +1,4 @@
-﻿name: Build APK
+name: Build APK
 on: [push]
 jobs:
   build:
@@ -11,7 +11,7 @@ jobs:
           java-version: '17'
       - uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.27.4'
+          flutter-version: '3.35.4'
           channel: 'stable'
           cache: false
       - run: flutter pub get
