@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'package:webview_flutter_android/webview_flutter_android.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
@@ -38,7 +38,7 @@ class _WebViewScreenState extends State<WebViewScreen> {
   void initState() {
     super.initState();
 
-    final WebViewController ctrl = WebViewController()
+    controller = WebViewController()
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
       ..setBackgroundColor(const Color(0xFF0a0614))
       ..setUserAgent("KayviewApp/1.0")
@@ -46,8 +46,7 @@ class _WebViewScreenState extends State<WebViewScreen> {
       ..setNavigationDelegate(
         NavigationDelegate(
           onPageFinished: (url) {
-            // ✅ FIXED: use ctrl, not controller, and only on Finished
-            ctrl.runJavaScript(
+            controller.runJavaScript(
               "window.KAYVIEW_API_URL='$apiUrl'; window.API_URL='$apiUrl'; localStorage.setItem('kv_api_url','$apiUrl');"
             );
           },
@@ -55,7 +54,7 @@ class _WebViewScreenState extends State<WebViewScreen> {
             if (error.errorType == WebResourceErrorType.hostLookup ||
                 error.errorType == WebResourceErrorType.connect ||
                 error.errorType == WebResourceErrorType.timeout) {
-              ctrl.loadFlutterAsset("assets/offline.html");
+              controller.loadFlutterAsset("assets/offline.html");
             }
           },
         ),
@@ -67,13 +66,12 @@ class _WebViewScreenState extends State<WebViewScreen> {
       )
       ..loadFlutterAsset("assets/index.html");
 
-    if (ctrl.platform is AndroidWebViewController) {
+    if (controller.platform is AndroidWebViewController) {
       AndroidWebViewController.enableDebugging(true);
-      final androidCtrl = ctrl.platform as AndroidWebViewController;
+      final androidCtrl = controller.platform as AndroidWebViewController;
       androidCtrl.setMediaPlaybackRequiresUserGesture(false);
     }
 
-    controller = ctrl;
     checkConnectivity();
   }
 
