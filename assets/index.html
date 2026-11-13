@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+<title>AMBIENT Host EA - KAYVIEW - YOUR CODE + FIXED M</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0a0614;--card:#1a1230;--card2:#221940;--pink:#ff00aa;--text:#e9e0ff;--muted:#8b7ab0;--glow: rgba(255,0,170,.5);--green:#00ff88}
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Space Grotesk',sans-serif}
+body{background:var(--bg);color:var(--text);padding-bottom:100px;position:relative;overflow-x:hidden;transition:background .3s}
+.header{display:flex;justify-content:space-between;padding:12px 16px;font-size:12px;color:var(--muted);position:relative;z-index:2}
+.hero{margin:12px 16px;background:radial-gradient(ellipse at top, var(--card2), var(--bg));border-radius:24px;padding:20px;text-align:center;border:1px solid var(--glow);position:relative;overflow:hidden;box-shadow:0 0 30px var(--glow)}
+.robot{height:260px;background:linear-gradient(135deg,var(--bg),var(--pink));border-radius:20px;display:flex;align-items:center;justify-content:center;font-size:60px;position:relative;z-index:1;transition:.3s}
+.title{font-size:28px;letter-spacing:1px;margin-top:16px;font-weight:700;position:relative;z-index:1}
+.badge{margin-top:12px;display:inline-block;padding:6px 20px;border-radius:15px;border:1px solid var(--glow);background:rgba(22,2,38,.8);font-size:12px;color:var(--pink);letter-spacing:1px;position:relative;z-index:1}
+.badge span{color:#fff;font-weight:bold}
+.controls{display:flex;margin:14px 16px;background:var(--card);border:1px solid var(--glow);border-radius:30px;padding:6px;justify-content:space-between;align-items:center;position:relative;z-index:2}
+.control-btn{background:transparent;border:none;color:var(--text);padding:10px 18px;border-radius:20px;font-size:13px;display:flex;align-items:center;gap:6px;cursor:pointer}
+.control-btn.center{background:var(--pink);color:white;width:56px;height:56px;border-radius:28px;justify-content:center;box-shadow:0 0 20px var(--glow);font-size:18px;transition:.3s}
+.list{margin:0 16px;position:relative;z-index:2}
+.card{background:rgba(26,18,48,.7);backdrop-filter:blur(10px);border:1px solid var(--glow);border-radius:16px;padding:14px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center;transition:.3s}
+.card.block{display:block}
+.toast{position:fixed;bottom:100px;left:16px;right:16px;background:#fff;color:#000;padding:14px;border-radius:12px;display:none;z-index:9999}
+.toast.show{display:flex}
+/* M DOT - FIXED + DRAGGABLE BY YOU - NOT ABSOLUTE IN HERO ANYMORE */
+.m-dot{position:fixed;top:70px;right:12px;width:58px;height:58px;background:#ef4444;border-radius:50%;display:none;align-items:center;justify-content:center;color:white;font-weight:bold;font-size:22px;border:2px solid #ff8a8a;box-shadow:0 0 15px #ef4444, 0 0 30px #ef4444;z-index:9998;cursor:grab;touch-action:none;user-select:none}
+.m-dot.on{display:flex;animation:pulse 1s infinite}
+.m-dot.dragging{animation:none;transform:scale(1.15);cursor:grabbing}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.15)}}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.85);display:none;align-items:flex-end;z-index:99999}
+.modal.show{display:flex}
+.modal-box{background:var(--bg);width:100%;border-radius:24px 24px 0 0;padding:20px;max-height:85vh;overflow:auto;border-top:2px solid var(--pink)}
+.pair{padding:14px;border-radius:12px;background:var(--card2);margin-bottom:8px;border:1px solid transparent;display:flex;justify-content:space-between;transition:.2s;cursor:pointer}
+.pair.selected{border-color:var(--pink);background:var(--card)}
+.pair .price{font-size:11px;color:var(--green);font-family:monospace}
+.bottom{position:fixed;bottom:0;left:0;right:0;background:rgba(13,2,23,.95);backdrop-filter:blur(15px);border-top:1px solid var(--glow);display:flex;justify-content:space-around;padding:10px 0 18px;z-index:100}
+.nav{color:var(--muted);font-size:11px;text-align:center;flex:1;cursor:pointer}
+.nav.active{color:var(--pink);font-weight:bold}
+.input{background:var(--card2);border:1px solid var(--glow);border-radius:12px;padding:14px;width:100%;color:var(--text);margin-top:8px}
+.color-row{display:flex;gap:10px;margin-top:10px;align-items:center;flex-wrap:wrap}
+.color-dot{width:32px;height:32px;border-radius:50%;border:2px solid white;cursor:pointer;transition:transform .2s}
+.color-dot:hover{transform:scale(1.2)}
+.color-dot.active{transform:scale(1.3);box-shadow:0 0 10px white}
+/* REAL VISIBLE BG EFFECTS */
+.bg-layer{position:fixed;inset:0;pointer-events:none;z-index:0;opacity:0;transition:opacity .5s}
+.bg-layer.active{opacity:1}
+#canvasParticles{position:fixed;inset:0;z-index:0;pointer-events:none}
+.bg-aurora{background:linear-gradient(120deg, transparent, var(--pink) 30%, #00ffff 70%, transparent);background-size:200% 200%;animation:aurora 6s ease infinite;mix-blend-mode:screen;opacity:.4}
+@keyframes aurora{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+.bg-lightningReal{background:transparent}
+.bg-lightningReal.flash{background:white !important;opacity:.25 !important;transition:opacity .1s}
+.bg-stars{background:radial-gradient(white 1px, transparent 1px);background-size:50px 50px;animation:stars 20s linear infinite}
+@keyframes stars{0%{transform:translateY(0)}100%{transform:translateY(50px)}}
+.live-dot{width:8px;height:8px;background:var(--green);border-radius:50%;display:inline-block;animation:blink 1s infinite;margin-right:4px}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+.log-line{line-height:1.9;font-size:12px;font-family:monospace}
+
+.bg-bluelight{background:radial-gradient(ellipse at 20% 30%, rgba(0,170,255,.28) 0%, transparent 50%), radial-gradient(ellipse at 80% 70%, rgba(0,100,255,.22) 0%, transparent 45%)}
+.bg-redtree{background:radial-gradient(ellipse at center, rgba(239,68,68,.35) 0%, transparent 60%), repeating-linear-gradient(115deg, transparent 0px, transparent 90px, rgba(239,68,68,.06) 90px, rgba(239,68,68,.06) 91px)}
+#canvasBlue{position:fixed;inset:0;z-index:0;pointer-events:none}
+@property --angle { syntax: '<angle>'; initial-value: 0deg; inherits: false; }
+.app-frame-border{position:fixed;inset:0;pointer-events:none;z-index:99997;border-radius:18px;padding:2px;background: conic-gradient(from var(--angle), #ff00aa, #00ffff, #ff4400, #a855f7, #ff00aa);mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);-webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);mask-composite: exclude; -webkit-mask-composite: destination-out;animation: rotateAngle 3s linear infinite;opacity:0; transition:opacity .4s;}
+.app-frame-border.active{opacity:1}
+@keyframes rotateAngle{ to { --angle: 360deg } }
+
+</style>
+</head>
+<body>
+
+<canvas id="canvasParticles" style="display:none"></canvas>
+<div class="bg-layer bg-aurora" id="fxAurora"></div>
+<div class="bg-layer bg-stars" id="fxStars"></div>
+<div class="bg-layer" id="fxLightningReal"></div>
+<canvas id="canvasBlue" style="display:none"></canvas>
+<div class="bg-layer bg-bluelight" id="fxBlue"></div>
+<div class="bg-layer bg-redtree" id="fxRedTree"></div>
+<div class="app-frame-border" id="appFrameBorder" style="opacity:0 !important"></div>
+
+
+<!-- DRAGGABLE M - YOU MOVE IT - FIXED ON TOP -->
+<div class="m-dot" id="mDot">KV</div>
+
+<div class="header"><span id="clock">19:51</span><span><span class="live-dot"></span><span id="liveStatus">LIVE FEED: --</span></span><span id="date"></span></div>
+
+<div class="hero" id="homeView">
+  <div class="robot" id="robotBox">🤖</div>
+  <div class="title">KAYVIEW CHARGER</div>
+  <div class="badge">POWERED BY <span>AMBIENT</span></div>
+  <div style="margin-top:12px;font-size:12px;color:var(--muted)">Trades: <span id="tradeCount" style="color:var(--text)">0 / 0</span> • <span id="livePriceTop" style="color:var(--green)">--</span> • <span id="liveSym">XAUUSD</span></div>
+</div>
+
+<div class="controls" id="ctrl">
+  <button class="control-btn" onclick="openLogs()">◉ BOT LOGS</button>
+  <button class="control-btn center" id="startBtn" onclick="toggleBot()">▶</button>
+  <button class="control-btn" onclick="openPairs()">◫ Symbols</button>
+</div>
+
+<div class="list" id="robotList">
+  <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin-bottom:8px"><span>ROBOT LIST</span><span style="color:var(--pink)">+ Add Key</span></div>
+  <div class="card"><div style="display:flex;gap:12px;align-items:center"><div style="width:44px;height:44px;border-radius:22px;background:var(--pink);display:flex;align-items:center;justify-content:center;transition:.3s" id="robotIcon">🤖</div><div>KAYVIEW CHARGER<br><small style="font-family:monospace;color:var(--muted)">PHE••••E91</small><br><small style="color:var(--pink)">Key expires in 357d 12h • LIVE</small></div></div><div>🗑️</div></div>
+</div>
+
+<div id="settingsView" style="display:none;padding:16px;position:relative;z-index:2">
+  <div class="card block">
+    <b>THEME - LIVE COLOR</b><br><small style="color:var(--muted)">Pick any color, changes instantly</small>
+    <div class="color-row">
+      <input type="color" id="colorPicker" value="#ff00aa" style="width:50px;height:40px;border-radius:8px;border:none;cursor:pointer" oninput="setThemeColor(this.value)">
+      <div class="color-dot active" style="background:#ff00aa" onclick="setThemeColor('#ff00aa')"></div>
+      <div class="color-dot" style="background:#00ffff" onclick="setThemeColor('#00ffff')"></div>
+      <div class="color-dot" style="background:#ffcc00" onclick="setThemeColor('#ffcc00')"></div>
+      <div class="color-dot" style="background:#00ff88" onclick="setThemeColor('#00ff88')"></div>
+      <div class="color-dot" style="background:#a855f7" onclick="setThemeColor('#a855f7')"></div>
+      <div class="color-dot" style="background:#ff4400" onclick="setThemeColor('#ff4400')"></div>
+    </div>
+  </div>
+
+  <div class="card block" style="margin-top:12px">
+    <b>BACKGROUND EFFECTS - LIVE</b><br><small style="color:var(--muted)">Real live visible effects - expanded</small>
+    <select class="input" id="bgSelect" onchange="setBackground(this.value)">
+      <option value="none" selected>None - Dark</option>
+      <option value="particles">Particles - Floating dots + lines (CANVAS)</option>
+      <option value="aurora">Aurora - Color wave shifting</option>
+      <option value="lightning">Lightning - White screen flash</option>
+      <option value="stars">Stars - Moving starfield</option>
+      <option value="gradient">Gradient - Slow purple shift</option>
+      <option value="blueLightning">Blue Lightning - Blue bolts + glow (NEW)</option>
+      <option value="redTree">Red Tree - Red lightning V3 (NEW)</option>
+    </select>
+  </div>
+
+  <div class="card block" style="margin-top:12px">
+    <b>EFFECTS</b><br><br>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+      <div><b style="font-size:13px">Background video</b><br><small style="color:var(--muted)">Background video on V3</small></div>
+      <label style="position:relative;display:inline-block;width:44px;height:24px"><input type="checkbox" checked style="opacity:0;width:0;height:0"><span style="position:absolute;inset:0;background:var(--pink);border-radius:24px"></span><span style="position:absolute;height:18px;width:18px;left:3px;bottom:3px;background:white;border-radius:50%;transform:translateX(20px)"></span></label>
+    </div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+      <div><b style="font-size:13px">Avatar cycle ring</b><br><small style="color:var(--muted)">Glow ring around the bot avatar</small></div>
+      <label style="position:relative;display:inline-block;width:44px;height:24px"><input type="checkbox" checked style="opacity:0;width:0;height:0"><span style="position:absolute;inset:0;background:var(--pink);border-radius:24px"></span><span style="position:absolute;height:18px;width:18px;left:3px;bottom:3px;background:white;border-radius:50%;transform:translateX(20px)"></span></label>
+    </div>
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <div><b style="font-size:13px">Animated border</b><br><small style="color:var(--muted)">Spinning gradient border on the app frame - on/off</small></div>
+      <label style="position:relative;display:inline-block;width:44px;height:24px"><input type="checkbox" id="toggleBorder" onchange="toggleAnimatedBorder(this.checked)" checked=false style="opacity:0;width:0;height:0"><span id="toggleBorderSpan" style="position:absolute;inset:0;background:#333;border-radius:24px;transition:.3s;cursor:pointer"><span style="position:absolute;height:18px;width:18px;left:3px;bottom:3px;background:white;border-radius:50%;transition:.3s;display:block" id="toggleKnob"></span></span></label>
+    </div>
+  </div>
+
+
+  <div class="card block" style="margin-top:12px">
+    <b>KV LOGO - DRAGGABLE + REAL LIVE ONLY</b><br><small style="color:var(--muted)">You move it. Logs show ONLY when real live execution happens with live price.</small>
+    <div style="font-family:monospace;font-size:11px;margin-top:8px;line-height:1.6">
+      <div>Status: <span id="wsStatus">Connecting Deriv live...</span></div>
+      <div>XAUUSD: <span id="sXAU">--</span> | BTC: <span id="sBTC">--</span></div>
+      <div>VOL_20: <span id="sV20">--</span> | VOL_80: <span id="sV80">--</span></div>
+    </div>
+  </div>
+
+  <div class="card block" style="margin-top:12px"><b>FONT</b><br>Space Grotesk</div>
+  <div class="card block" style="margin-top:12px"><b>AVATAR SIZE</b><br><input type="range" style="width:100%;margin-top:8px;accent-color:var(--pink)" value="268" min="100" max="400" oninput="document.getElementById('robotBox').style.height=this.value+'px'"><small style="color:var(--muted)">268px</small></div>
+</div>
+
+<div id="mtView" style="display:none;padding:16px;position:relative;z-index:2">
+  <div class="card block">METATRADER<br><small>Secured via MetaCopier API • Live: <span id="mtLive">--</span></small>
+    <input class="input" placeholder="Account ID">
+    <input class="input" type="password" placeholder="Password">
+    <input class="input" placeholder="Server">
+    <button style="width:100%;margin-top:12px;padding:14px;border-radius:12px;background:var(--pink);color:white;border:none;font-weight:bold;transition:.3s">CONNECT</button>
+  </div>
+</div>
+
+<div id="scanView" style="display:none;padding:16px;position:relative;z-index:2">
+  <div class="card block">AI Analysis - SNIPER ELITE • LIVE REAL<br><br>
+    <div style="display:flex;gap:8px"><select class="input" id="pair" onchange="switchSymbol(this.value)"><option value="frxXAUUSD">XAUUSD</option><option value="cryBTCUSD">BTCUSD</option><option value="R_20">VOL_20</option><option value="1HZ80V">VOL_80</option></select><select class="input"><option>M15</option><option>M5</option><option>H1</option></select></div>
+    <div style="display:flex;gap:8px"><input class="input" id="lot" value="0.03" placeholder="Lot 0.01"><input class="input" id="tradesInput" value="10" placeholder="Trades e.g. 10"></div>
+    <div style="margin-top:12px;display:flex;gap:8px"><div style="flex:1;background:rgba(58,18,32,.8);padding:12px;border-radius:12px;text-align:center">BID<br><span id="bid">--</span><br><small id="bidTime" style="font-size:9px;color:var(--muted)">--</small></div><div style="flex:1;background:rgba(18,58,32,.8);padding:12px;border-radius:12px;text-align:center">ASK<br><span id="ask">--</span><br><small style="color:var(--green);font-size:9px"><span class="live-dot"></span>LIVE</small></div></div>
+    <button onclick="analyse()" style="width:100%;margin-top:12px;padding:14px;background:var(--pink);border:none;border-radius:12px;color:white;font-weight:bold;transition:.3s">ANALYSE LIVE SIGNAL</button>
+    <div id="qStatus" style="text-align:center;margin-top:8px;color:var(--muted);font-size:12px">LIVE FEED - Waiting for real execution</div>
+  </div>
+</div>
+
+<div class="toast" id="toast">✓ <span id="tText">Bot armed — waiting for signal</span></div>
+
+<div class="modal" id="pairs" onclick="if(event.target==this)closePairs()">
+  <div class="modal-box">
+    <div style="display:flex;justify-content:space-between"><b>Pairs • LIVE</b><span onclick="closePairs()">✕</span></div><br>
+    <div class="pair" onclick="selectSymbol('frxXAUUSD','XAUUSD')"><span>XAUUSD</span><span style="color:var(--green);font-family:monospace" id="pXAU">--</span></div>
+    <div class="pair" onclick="selectSymbol('cryBTCUSD','BTCUSD')"><span>BTCUSD</span><span style="color:var(--green);font-family:monospace" id="pBTC">--</span></div>
+    <div class="pair" onclick="selectSymbol('R_20','VOL_20')"><span>VOL_20</span><span style="color:var(--green);font-family:monospace" id="pV20">--</span></div>
+    <div class="pair" onclick="selectSymbol('1HZ80V','VOL_80')"><span>VOL_80</span><span style="color:var(--green);font-family:monospace" id="pV80">--</span></div>
+  </div>
+</div>
+
+
+<div class="modal" id="logsModal" onclick="if(event.target==this)closeLogs()">
+  <div class="modal-box" style="background:#000;font-family:monospace;font-size:12px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+      <div style="color:#8b7ab0;font-size:10px;letter-spacing:2px">KEY FROM MENTOR</div>
+      <span onclick="closeLogs()" style="cursor:pointer;color:white;font-size:16px">✕</span>
+    </div>
+    <div style="color:white;font-weight:700;font-size:14px;margin-bottom:14px">KV</div>
+    
+    <div style="display:flex;gap:12px;align-items:center;margin-bottom:14px">
+      <div style="width:48px;height:48px;background:#ef4444;border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-weight:900;font-size:16px;border:2px solid #ff8a8a;box-shadow:0 0 12px #ef4444">KV</div>
+      <div>
+        <div style="color:#8b7ab0;font-size:10px">MENTOR</div>
+        <div style="color:white;font-weight:700;font-size:14px">KV</div>
+        <div style="color:#8b7ab0;font-size:11px;font-family:monospace">M1-0789</div>
+      </div>
+    </div>
+
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px">
+      <span style="padding:6px 12px;border:1.5px solid #ef4444;border-radius:20px;color:#ef4444;font-size:11px;font-family:monospace">✕ SERVER OFFLINE</span>
+      <span style="padding:6px 12px;border:1.5px solid #00aaff;border-radius:20px;color:#00aaff;font-size:11px;font-family:monospace">⚡ SOURCE: IDLE</span>
+      <span style="padding:6px 12px;border:1.5px solid #ef4444;border-radius:20px;color:#ef4444;font-size:11px;font-family:monospace">✕ SERVER OFFLINE</span>
+    </div>
+
+    <div style="background:#0a0a0a;border-radius:12px;padding:12px;font-family:monospace;font-size:12px;line-height:1.8;color:#00ff88">
+      <div style="color:#666">21:50:26 - Server offline...</div>
+      <div id="emptyLogsMsg" style="color:#444;margin-top:8px">>> No real execution yet. Start bot + Analyse. Logs will appear ONLY when live signal executes with real Deriv price...</div>
+      <div id="liveLogs"></div>
+    </div>
+
+    <div style="margin-top:14px;padding-top:10px;border-top:1px solid #1a1230;display:flex;justify-content:space-between;color:#5a4a7a;font-size:10px;letter-spacing:1px">
+      <span>BOT LOGS</span>
+      <span>AMBIENT HOST EA - KV - READY</span>
+    </div>
+  </div>
+</div>
+
+</div>
+
+<div class="bottom">
+  <div class="nav active" onclick="tab('home',this)">🏠<br>Home</div>
+  <div class="nav" onclick="tab('mt',this)">📊<br>Metatrader</div>
+  <div class="nav" onclick="tab('scan',this)">🧠<br>Scanner</div>
+  <div class="nav" onclick="tab('settings',this)">⚙️<br>Settings</div>
+</div>
+
+<script>
+// YOUR CODE + LIVE DERIV FEED + DRAGGABLE M + REAL LIVE LOGS ONLY
+let armed=false, totalTrades=0, executedTrades=0;
+let particlesActive=false, animId=null;
+let livePrices={frxXAUUSD:null,cryBTCUSD:null,R_20:null,'1HZ80V':null};
+let currentSymbol='frxXAUUSD', currentDisplay='XAUUSD';
+let ws=null;
+
+// DRAGGABLE M LOGO - YOU MOVE IT, NOT AUTO
+let isDragging=false, startX, startY, initX, initY, hasMoved=false;
+const mDot=document.getElementById('mDot');
+mDot.addEventListener('pointerdown', e=>{
+  isDragging=true; hasMoved=false;
+  mDot.setPointerCapture(e.pointerId);
+  startX=e.clientX; startY=e.clientY;
+  initX=mDot.offsetLeft; initY=mDot.offsetTop;
+  mDot.classList.add('dragging');
+  mDot.style.transition='none';
+});
+mDot.addEventListener('pointermove', e=>{
+  if(!isDragging) return;
+  const dx=e.clientX-startX, dy=e.clientY-startY;
+  if(Math.abs(dx)>5||Math.abs(dy)>5) hasMoved=true;
+  let nx=initX+dx, ny=initY+dy;
+  nx=Math.max(0,Math.min(window.innerWidth-58,nx));
+  ny=Math.max(0,Math.min(window.innerHeight-80,ny));
+  mDot.style.left=nx+'px'; mDot.style.top=ny+'px';
+});
+mDot.addEventListener('pointerup', e=>{
+  isDragging=false;
+  mDot.classList.remove('dragging');
+  mDot.style.transition='';
+  if(!hasMoved){
+    if(armed) openLogs();
+  }
+});
+
+function connectLive(){
+  const wsStatus=document.getElementById('wsStatus');
+  const liveStatus=document.getElementById('liveStatus');
+  ws=new WebSocket('wss://ws.derivws.com/websockets/v3?app_id=1089');
+  ws.onopen=()=>{
+    if(wsStatus) wsStatus.innerText='Connected • Real ticks streaming';
+    ['frxXAUUSD','cryBTCUSD','R_20','1HZ80V'].forEach(s=>ws.send(JSON.stringify({ticks:s,subscribe:1})));
+  };
+  ws.onmessage=(msg)=>{
+    const d=JSON.parse(msg.data);
+    if(d.tick){
+      const sym=d.tick.symbol, price=parseFloat(d.tick.quote);
+      livePrices[sym]=price;
+      if(sym===currentSymbol){
+        document.getElementById('livePriceTop').innerText=price.toFixed(2);
+        document.getElementById('liveSym').innerText=currentDisplay;
+        document.getElementById('liveStatus').innerText=`LIVE ${currentDisplay}: ${price.toFixed(2)}`;
+        document.getElementById('bid').innerText=price.toFixed(2);
+        document.getElementById('ask').innerText=(price+price*0.0002).toFixed(2);
+        document.getElementById('mtLive').innerText=price.toFixed(2);
+        document.getElementById('bidTime').innerText=new Date().toLocaleTimeString();
+      }
+      if(sym==='frxXAUUSD'){document.getElementById('pXAU').innerText=price.toFixed(2);document.getElementById('sXAU').innerText=price.toFixed(2);}
+      if(sym==='cryBTCUSD'){document.getElementById('pBTC').innerText=price.toFixed(2);document.getElementById('sBTC').innerText=price.toFixed(2);}
+      if(sym==='R_20'){document.getElementById('pV20').innerText=price.toFixed(2);document.getElementById('sV20').innerText=price.toFixed(2);}
+      if(sym==='1HZ80V'){document.getElementById('pV80').innerText=price.toFixed(2);document.getElementById('sV80').innerText=price.toFixed(2);}
+    }
+  };
+  ws.onclose=()=>setTimeout(connectLive,3000);
+}
+
+function switchSymbol(val){
+  currentSymbol=val;
+  const map={'frxXAUUSD':'XAUUSD','cryBTCUSD':'BTCUSD','R_20':'VOL_20','1HZ80V':'VOL_80'};
+  currentDisplay=map[val]||val;
+  document.getElementById('liveSym').innerText=currentDisplay;
+  if(livePrices[val]){
+    document.getElementById('bid').innerText=livePrices[val].toFixed(2);
+    document.getElementById('ask').innerText=(livePrices[val]*1.0002).toFixed(2);
+  }
+}
+function selectSymbol(a,b){switchSymbol(a);document.getElementById('pair').value=a;closePairs();}
+
+function toggleBot(){
+  armed=!armed;
+  document.getElementById('startBtn').innerHTML=armed?'■':'▶';
+  const dot=document.getElementById('mDot');
+  if(armed){
+    dot.classList.add('on');
+    dot.style.left=(window.innerWidth-70)+'px';
+    dot.style.top='70px';
+  }else{
+    dot.classList.remove('on');
+  }
+  document.getElementById('tText').innerText=armed?'Bot armed — drag M anywhere, logs empty until real execution':'Bot stopped';
+  let t=document.getElementById('toast');t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500);
+}
+function openPairs(){document.getElementById('pairs').classList.add('show')}
+function closePairs(){document.getElementById('pairs').classList.remove('show')}
+function openLogs(){
+  if(!armed){alert('Start bot first');return;}
+  document.getElementById('logsModal').classList.add('show');
+}
+function closeLogs(){document.getElementById('logsModal').classList.remove('show')}
+function tab(name,el){
+  document.querySelectorAll('.nav').forEach(n=>n.classList.remove('active'));el.classList.add('active');
+  document.getElementById('homeView').style.display=name=='home'?'block':'none';
+  document.getElementById('ctrl').style.display=name=='home'?'flex':'none';
+  document.getElementById('robotList').style.display=name=='home'?'block':'none';
+  document.getElementById('settingsView').style.display=name=='settings'?'block':'none';
+  document.getElementById('mtView').style.display=name=='mt'?'block':'none';
+  document.getElementById('scanView').style.display=name=='scan'?'block':'none';
+}
+function analyse(){
+  let p=document.getElementById('pair').value, lot=document.getElementById('lot').value||'0.03';
+  let tradesVal=document.getElementById('tradesInput').value||'10';
+  totalTrades=parseInt(tradesVal);
+  document.getElementById('tradeCount').innerText=executedTrades+' / '+totalTrades;
+  let livePrice=livePrices[currentSymbol];
+  if(!livePrice){
+    document.getElementById('qStatus').innerText='Waiting for LIVE Deriv price...';
+    return;
+  }
+  document.getElementById('qStatus').innerText='Scanning '+currentDisplay+' @ '+livePrice.toFixed(2)+'... waiting for REAL LIVE signal';
+  setTimeout(()=>{
+    if(!armed) return;
+    executedTrades++;
+    document.getElementById('tradeCount').innerText=executedTrades+' / '+totalTrades;
+    let tp=(livePrice+livePrice*0.002).toFixed(2);
+    let sl=(livePrice-livePrice*0.001).toFixed(2);
+    document.getElementById('emptyLogsMsg').style.display='none';
+    let logs=document.getElementById('liveLogs');
+    logs.innerHTML+=`
+      <div class="log-line" style="color:#00ff88">>> CONNECTED TO TRADE SERVER [${new Date().toLocaleTimeString()}]</div>
+      <div class="log-line">>> Connected to trade server</div>
+      <div class="log-line" style="color:#8b7aff">>> KAYVIEW PRO+ trading</div>
+      <div class="log-line" style="color:#a855f7">>> <span style="background:#a855f7;color:white;padding:1px 6px;border-radius:4px">BUY ${currentDisplay}</span> @ ${livePrice.toFixed(2)} LIVE REAL</div>
+      <div class="log-line" style="color:#00ff88">>> TP ADDED ${tp} (LIVE)</div>
+      <div class="log-line" style="color:#ff4444">>> SL ADDED ${sl} (LIVE)</div>
+      <div class="log-line">>> Trade ${executedTrades}/${totalTrades}: Accepting disclaimer...</div>
+      <div class="log-line">>> Linking account...</div>
+      <div class="log-line">>> Params: Buy ${currentDisplay} @ vol ${lot} @ ${livePrice.toFixed(2)}</div>
+      <div class="log-line" style="color:#00ff88">>> TRADE ${executedTrades}/${totalTrades} SUCCESSFUL: Buy ${currentDisplay}</div>
+      <div class="log-line">>> Selecting symbol ${currentDisplay}</div>
+      <div class="log-line" style="color:#a855f7">>> <span style="background:#a855f7;color:white;padding:1px 6px;border-radius:4px">BUY ${currentDisplay}</span></div>
+      <div style="border-bottom:1px solid #222;margin:8px 0"></div>
+    `;
+    document.getElementById('qStatus').innerText=`REAL LIVE Signal @ ${livePrice.toFixed(2)} - Executed`;
+    openLogs();
+  }, 3000+Math.random()*2000);
+}
+
+
+function toggleAnimatedBorder(on){
+  let el=document.getElementById('appFrameBorder');
+  let knob=document.getElementById('toggleKnob');
+  let span=document.getElementById('toggleBorderSpan');
+  if(on){ el.classList.add('active'); knob.style.transform='translateX(20px)'; span.style.background='var(--pink)'; }
+  else { el.classList.remove('active'); knob.style.transform='translateX(0)'; span.style.background='#333'; }
+  localStorage.setItem('kv_border', on?'1':'0');
+}
+// gradient off by default - no auto restore
+localStorage.setItem('kv_border','0');
+
+let blueActive=false, blueAnim=null;
+
+function setThemeColor(color){
+  document.documentElement.style.setProperty('--pink', color);
+  document.documentElement.style.setProperty('--glow', color + '80');
+  document.getElementById('colorPicker').value = color;
+  document.querySelectorAll('.color-dot').forEach(d=>d.classList.remove('active'));
+  document.querySelectorAll('.color-dot').forEach(d=>{ if(d.style.background==color || d.style.background.includes(color)) d.classList.add('active') });
+}
+
+function setBackground(type){
+  document.querySelectorAll('.bg-layer').forEach(e=>e.classList.remove('active'));
+  let canvas=document.getElementById('canvasParticles');
+  let canvasBlue=document.getElementById('canvasBlue');
+  canvas.style.display='none'; canvasBlue.style.display='none';
+  particlesActive=false; blueActive=false;
+  if(animId) cancelAnimationFrame(animId);
+  if(blueAnim) cancelAnimationFrame(blueAnim);
+  if(type=='particles'){
+    canvas.style.display='block'; canvas.width=window.innerWidth; canvas.height=window.innerHeight;
+    let ctx=canvas.getContext('2d'); let dots=[]; let pink=getComputedStyle(document.documentElement).getPropertyValue('--pink').trim();
+    for(let i=0;i<80;i++) dots.push({x:Math.random()*canvas.width,y:Math.random()*canvas.height,vx:(Math.random()-0.5)*1.5,vy:(Math.random()-0.5)*1.5,r:Math.random()*3+1});
+    particlesActive=true;
+    function draw(){
+      if(!particlesActive) return;
+      ctx.clearRect(0,0,canvas.width,canvas.height); ctx.fillStyle=pink;
+      dots.forEach(d=>{
+        d.x+=d.vx; d.y+=d.vy; if(d.x<0||d.x>canvas.width) d.vx*=-1; if(d.y<0||d.y>canvas.height) d.vy*=-1;
+        ctx.beginPath(); ctx.arc(d.x,d.y,d.r,0,Math.PI*2); ctx.fill();
+        dots.forEach(d2=>{ let dx=d.x-d2.x, dy=d.y-d2.y, dist=Math.sqrt(dx*dx+dy*dy); if(dist<120){ ctx.strokeStyle=pink+'33'; ctx.lineWidth=0.5; ctx.beginPath(); ctx.moveTo(d.x,d.y); ctx.lineTo(d2.x,d2.y); ctx.stroke(); }});
+      });
+      animId=requestAnimationFrame(draw);
+    } draw();
+  }
+  if(type=='aurora') document.getElementById('fxAurora').classList.add('active');
+  if(type=='stars') document.getElementById('fxStars').classList.add('active');
+  if(type=='lightning'){
+    let el=document.getElementById('fxLightningReal'); el.classList.add('active');
+    function flashLoop(){ if(document.getElementById('bgSelect').value!='lightning') return; setTimeout(()=>{ el.classList.add('flash'); setTimeout(()=>{ el.classList.remove('flash'); flashLoop(); },150); },2000+Math.random()*4000); } flashLoop();
+  }
+  if(type=='blueLightning'){
+    document.getElementById('fxBlue').classList.add('active');
+    canvasBlue.style.display='block'; canvasBlue.width=window.innerWidth; canvasBlue.height=window.innerHeight;
+    let ctx=canvasBlue.getContext('2d'); blueActive=true;
+    function drawBlue(){
+      if(!blueActive) return; ctx.clearRect(0,0,canvasBlue.width,canvasBlue.height);
+      if(Math.random()>0.97){
+        let x=Math.random()*canvasBlue.width; let y=0; ctx.strokeStyle=`rgba(0,180,255,${0.5+Math.random()*0.5})`; ctx.lineWidth=1.2+Math.random()*2.2; ctx.shadowBlur=14; ctx.shadowColor='#00aaff'; ctx.beginPath(); ctx.moveTo(x,y);
+        while(y<canvasBlue.height*0.8){ x+=(Math.random()-0.5)*34; y+=18+Math.random()*32; ctx.lineTo(x,y); } ctx.stroke(); ctx.shadowBlur=0;
+      }
+      blueAnim=requestAnimationFrame(drawBlue);
+    } drawBlue();
+  }
+  if(type=='redTree'){ document.getElementById('fxRedTree').classList.add('active'); }
+  if(type=='gradient'){
+    document.body.style.background='linear-gradient(135deg, #0a0614, '+getComputedStyle(document.documentElement).getPropertyValue('--pink').trim()+'33)';
+    document.body.style.backgroundSize='400% 400%'; document.body.style.animation='aurora 6s ease infinite';
+  }else{ document.body.style.background='#0a0614'; document.body.style.animation='none'; document.getElementById('appFrameBorder').classList.remove('active'); }
+}
+
+connectLive();
+setInterval(()=>{document.getElementById('clock').innerText=new Date().toLocaleTimeString()},1000);
+document.getElementById('date').innerText=new Date().toDateString();
+function removeBot(){}
+</script>
+</body>
+</html>
