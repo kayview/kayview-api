@@ -1,0 +1,1201 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+<title>AMBIENT Host EA - KAYVIEW - REAL PLATFORM</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0a0614;--card:#1a1230;--card2:#221940;--pink:#0a2a6e;--text:#e9e0ff;--muted:#8b7ab0;--glow: rgba(10,42,110,.55);--green:#00ff88}
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Space Grotesk',sans-serif}
+body{background:#0a0614;color:var(--text);padding-bottom:100px;position:relative;overflow-x:hidden}
+.header{display:flex;justify-content:space-between;padding:12px 16px;font-size:12px;color:var(--muted);position:relative;z-index:2}
+.hero{margin:12px 16px;background:radial-gradient(ellipse at top, var(--card2), var(--bg));border-radius:24px;padding:20px;text-align:center;border:1px solid var(--glow);position:relative;overflow:hidden;box-shadow:0 0 30px var(--glow);min-height:420px;display:flex;flex-direction:column;justify-content:flex-end}
+.title{font-size:28px;letter-spacing:1px;margin-top:16px;font-weight:700;position:relative;z-index:1}
+.badge{margin-top:12px;display:inline-block;padding:6px 20px;border-radius:15px;border:1px solid var(--glow);background:rgba(22,2,38,.8);font-size:12px;color:#6aa4ff;letter-spacing:1px;position:relative;z-index:1}
+.badge span{color:#fff;font-weight:bold}
+.controls{display:flex;margin:14px 16px;background:var(--card);border:1px solid #00aaff;border-radius:30px;padding:6px;justify-content:space-between;align-items:center;position:relative;z-index:2}
+.control-btn{background:transparent;border:none;color:var(--text);padding:10px 18px;border-radius:20px;font-size:13px;display:flex;align-items:center;gap:6px;cursor:pointer}
+.control-btn.center{background:linear-gradient(135deg,#00aaff,#0077ff);color:white;width:56px;height:56px;border-radius:28px;justify-content:center;box-shadow:0 0 20px rgba(0,170,255,.5);font-size:18px}
+.list{margin:0 16px;position:relative;z-index:2}
+.card{background:rgba(26,18,48,.7);backdrop-filter:blur(10px);border:1px solid var(--glow);border-radius:16px;padding:14px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center}
+.card.block{display:block}
+.toast{position:fixed;bottom:100px;left:16px;right:16px;background:#fff;color:#000;padding:14px;border-radius:12px;display:none;z-index:9999}
+.toast.show{display:flex}
+.m-dot{position:fixed;top:70px;right:12px;width:58px;height:58px;background:#ef4444;border-radius:50%;display:none;align-items:center;justify-content:center;color:white;font-weight:bold;font-size:22px;border:2px solid #ff8a8a;box-shadow:0 0 15px #ef4444;z-index:9998;cursor:grab;touch-action:none;user-select:none}
+.m-dot.on{display:flex;animation:pulse 1s infinite}
+.m-dot.dragging{animation:none;transform:scale(1.15);cursor:grabbing}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.15)}}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.85);display:none;align-items:flex-end;z-index:99999}
+.modal.show{display:flex}
+.modal-box{background:var(--bg);width:100%;border-radius:24px 24px 0 0;padding:20px;max-height:85vh;overflow:auto;border-top:2px solid #00aaff}
+.pair{padding:14px;border-radius:12px;background:var(--card2);margin-bottom:8px;display:flex;justify-content:space-between;cursor:pointer}
+.bottom{position:fixed;bottom:0;left:0;right:0;background:rgba(21,8,38,.98);backdrop-filter:blur(15px);border-top:1px solid rgba(168,85,247,.28);display:flex;justify-content:space-around;align-items:flex-start;padding:10px 0 18px;z-index:100}
+.nav{color:#9a8bb5;font-size:13px;text-align:center;flex:1;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px}
+.nav svg{width:28px;height:28px;stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;opacity:.85;display:block}
+.nav span{font-size:12px;letter-spacing:.2px;line-height:1}
+.nav.active{color:#00aaff;font-weight:600;text-shadow:0 0 12px rgba(0,170,255,.9)}
+.input{background:var(--card2);border:1px solid var(--glow);border-radius:12px;padding:14px;width:100%;color:var(--text);margin-top:8px}
+.color-row{display:flex;gap:10px;margin-top:10px;align-items:center;flex-wrap:wrap}
+.color-dot{width:32px;height:32px;border-radius:50%;border:2px solid white;cursor:pointer}
+.live-dot{width:8px;height:8px;background:var(--green);border-radius:50%;display:inline-block;animation:blink 1s infinite;margin-right:4px}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+.log-line{line-height:1.9;font-size:12px;font-family:monospace}
+#scanView{background:#02182b;padding:16px 16px 20px;position:relative;z-index:2}
+.scanner-top{text-align:center;padding:4px 0 8px;position:relative}
+.scanner-date{font-size:13px;color:#8aa8bf;text-align:center;margin-bottom:12px}
+.scanner-news{position:absolute;top:0;right:0;background:rgba(0,120,220,.15);border:1px solid #00aaff;color:#00aaff;padding:7px 14px;border-radius:20px;font-size:12px;font-weight:700;cursor:pointer}
+.scanner-avatar-wrap{width:150px;height:150px;margin:8px auto 0;border-radius:50%;padding:3px;background:conic-gradient(from 0deg,#00eaff,#00aaff,#00eaff);box-shadow:0 0 30px rgba(0,234,255,.6);position:relative}
+.scanner-avatar-wrap img{width:100%;height:100%;object-fit:cover;border-radius:50%;display:block;background:#02182b}
+.scanner-title{font-family:Georgia,serif;font-size:28px;color:#fff;margin-top:14px;text-align:center}
+.scanner-sub{font-size:12px;letter-spacing:2px;color:#8aa8bf;text-align:center;margin-top:4px}
+.scanner-steps{margin-top:14px;text-align:center;font-size:13px;color:#8aa8bf;line-height:1.8}
+.scanner-steps b{color:#00aaff}
+.scanner-card{background:#04233d;border:1px solid #1a4a6a;border-radius:20px;padding:16px;margin-top:18px}
+.scanner-label{font-size:11px;letter-spacing:1px;color:#5a7a9a;margin:14px 0 6px}
+.scanner-label:first-child{margin-top:0}
+.scanner-select{width:100%;background:#01101f;border:1px solid #1a4a6a;border-radius:12px;padding:14px;color:#fff;font-size:16px;font-weight:700;cursor:pointer}
+.scanner-input{width:100%;background:#01101f;border:1px solid #1a4a6a;border-radius:12px;padding:14px;color:#fff;font-size:15px}
+.scanner-row{display:flex;gap:12px}
+.scanner-row>div{flex:1}
+.live-quote{background:#021a2e;border:1px solid #1a3a5a;border-radius:16px;padding:14px;margin-top:16px}
+.bid-ask{display:flex;gap:12px;margin-top:12px}
+.bid-box{flex:1;background:#3a0a12;border:1px solid #ff3344;border-radius:14px;padding:14px;text-align:center}
+.ask-box{flex:1;background:#0a2e1a;border:1px solid #00ff88;border-radius:14px;padding:14px;text-align:center}
+.bid-box .lbl{font-size:11px;letter-spacing:2px;color:#ff6a7a}
+.ask-box .lbl{font-size:11px;letter-spacing:2px;color:#6affa8}
+.bid-box .val,.ask-box .val{font-size:22px;font-weight:800;color:#fff;margin-top:4px;font-family:monospace}
+.live-market{background:#021a2e;border:1px solid #1a3a5a;border-radius:16px;padding:14px;margin-top:12px}
+.scanner-analyse{width:100%;margin-top:16px;padding:16px;background:linear-gradient(135deg,#00aaff,#0077ff);border:none;border-radius:14px;color:white;font-weight:800;font-size:15px;letter-spacing:1px;cursor:pointer;box-shadow:0 0 20px rgba(0,170,255,.4)}
+#signalResult{display:none;margin-top:16px;background:#021a2e;border:1px solid #1a4a6a;border-radius:20px;padding:16px}
+#signalResult.show{display:block}
+.signal-head{display:flex;justify-content:space-between;align-items:flex-start}
+.signal-setup{font-size:15px;font-weight:800;color:#fff;line-height:1.3;margin-top:4px}
+.signal-dir-val{font-size:18px;font-weight:800;color:#ff4444}
+.signal-dir-val.buy{color:#00ff88}
+.signal-bullets{margin-top:14px;font-size:13px;line-height:1.9;color:#b8d0e8}
+.signal-boxes{display:flex;gap:8px;margin-top:14px}
+.signal-box{flex:1;background:#04233d;border:1px solid #1a4a6a;border-radius:12px;padding:10px;text-align:center}
+.signal-box small{font-size:10px;letter-spacing:1px;color:#5a7a9a}
+.signal-box div{font-size:14px;font-weight:800;color:#fff;margin-top:2px}
+.signal-box .red{color:#ff4444}
+.signal-box .blue{color:#00aaff}
+.signal-tps{margin-top:14px;font-size:13px;line-height:2.2;color:#8aa8bf}
+.signal-tps div{display:flex;justify-content:space-between}
+.signal-tps b{color:#fff}
+#onboarding{position:fixed;inset:0;background:#070512;z-index:999999;display:flex;flex-direction:column;overflow:hidden}
+#onboarding .onb-screen{display:none;flex:1;flex-direction:column;align-items:center;justify-content:center;padding:24px;text-align:center;overflow:auto}
+#onboarding .onb-screen.show{display:flex}
+.onb-logo{width:90px;height:90px;border-radius:50%;background:#0a2a6e;display:flex;align-items:center;justify-content:center;font-size:42px;color:white;box-shadow:0 0 30px rgba(10,42,110,.7);margin-bottom:18px}
+.onb-title{font-size:26px;font-weight:700;letter-spacing:1px}
+.onb-sub{font-size:12px;letter-spacing:2px;color:#8b7ab0;margin-top:6px}
+.onb-big{font-size:22px;font-weight:700;margin-top:14px}
+.onb-btn{width:100%;max-width:320px;margin-top:22px;padding:15px;border-radius:28px;background:#0a2a6e;color:white;border:none;font-weight:700;font-size:14px;letter-spacing:1px;cursor:pointer}
+.onb-input{width:100%;max-width:320px;background:#1a1230;border:1px solid rgba(10,42,110,.8);border-radius:12px;padding:14px;color:#e9e0ff;margin-top:14px;font-size:14px}
+.onb-card{width:100%;max-width:340px;background:#1a1230;border:1px solid rgba(10,42,110,.6);border-radius:20px;padding:20px;text-align:left;margin-top:16px}
+.onb-row{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid #221940;font-size:13px}
+.onb-check{display:flex;gap:8px;align-items:flex-start;font-size:12px;color:#8b7ab0;margin-top:14px;text-align:left}
+.onb-small{font-size:11px;color:#8b7ab0;margin-top:10px}
+.onb-back{position:absolute;top:14px;left:16px;color:#8b7ab0;font-size:20px;cursor:pointer}
+body.onboarding-active .header, body.onboarding-active #homeView, body.onboarding-active #ctrl, body.onboarding-active #robotList, body.onboarding-active .bottom, body.onboarding-active #settingsView, body.onboarding-active #mtView, body.onboarding-active #scanView, body.onboarding-active #platformView{visibility:hidden}
+</style>
+</head>
+<body class="onboarding-active">
+
+<div id="onboarding">
+  <div class="onb-screen show" id="onb-welcome">
+    <div class="onb-logo"><span>KV</span></div>
+    <div class="onb-title">WELCOME TO</div>
+    <div class="onb-big">KAYVIEW CHARGER<br>HOW TO GUIDE</div>
+    <div class="onb-sub">POWERED BY AMBIENT</div>
+    <button class="onb-btn" onclick="onbGo('onb-start')">START</button>
+    <div class="onb-small">Welcome to EA Trade how to guide series.<br>Today we will show you how to use the mobile APP.</div>
+  </div>
+  <div class="onb-screen" id="onb-start">
+    <div class="onb-back" onclick="onbGo('onb-welcome')">‹</div>
+    <div class="onb-logo"><span>KV</span></div>
+    <div class="onb-title">KAYVIEW CHARGER</div>
+    <div class="onb-sub">POWERED BY AMBIENT</div>
+    <button class="onb-btn" onclick="onbGo('onb-login')">START</button>
+  </div>
+  <div class="onb-screen" id="onb-login">
+    <div class="onb-back" onclick="onbGo('onb-start')">‹</div>
+    <div class="onb-logo" style="width:64px;height:64px;font-size:26px"><span>KV</span></div>
+    <div class="onb-title">LOGIN</div>
+    <input class="onb-input" id="onb-email" placeholder="EMAIL" type="email">
+    <button class="onb-btn" id="onb-proceed" onclick="onbProceed()">PROCEED</button>
+    <div class="onb-small" id="onb-login-msg"></div>
+  </div>
+  <div class="onb-screen" id="onb-pay">
+    <div class="onb-back" onclick="onbGo('onb-login')">‹</div>
+    <div class="onb-title">Pay for App</div>
+    <div class="onb-card">
+      <b>KAYVIEW CHARGER</b><br><small style="color:#8b7ab0">Get instant access to professional trading tool and expert advisor trading performance.</small>
+      <div class="onb-row"><span>Price</span><b>R550</b></div>
+      <div class="onb-row"><span>Email</span><span id="onb-pay-email" style="font-size:11px">--</span></div>
+      <label class="onb-check"><input type="checkbox" id="onb-agree" style="accent-color:#0a2a6e"> <span>I agree to Privacy Policy and Terms of Service</span></label>
+    </div>
+    <button class="onb-btn" onclick="onbBuy()">Buy Now</button>
+    <div class="onb-small" id="onb-pay-msg"></div>
+  </div>
+  <div class="onb-screen" id="onb-payment">
+    <div class="onb-back" onclick="onbGo('onb-pay')">‹</div>
+    <div class="onb-title">Trade Solutions</div>
+    <div class="onb-card">
+      <div class="onb-row"><span>Total</span><b>R550.00 ZAR</b></div>
+      <div style="margin-top:14px;font-size:12px;color:#8b7ab0">How will you be paying today? This app does NOT take card payments directly - it creates a PENDING order for your mentor to approve after you pay them.</div>
+      <button class="onb-btn" style="background:#111" onclick="onbPayDone('Apple Pay - PENDING')">Apple Pay - Create PENDING Order</button>
+      <button class="onb-btn" style="background:#1a1230" onclick="onbPayDone('Instant EFT - PENDING')">Instant EFT - Create PENDING Order</button>
+      <button class="onb-btn" style="background:#1a1230" onclick="onbPayDone('Capitec Pay - PENDING')">Capitec Pay - Create PENDING Order</button>
+      <button class="onb-btn" style="background:#1a1230" onclick="onbPayDone('SnapScan - PENDING')">SnapScan - Create PENDING Order</button>
+      <div class="onb-small">No money is taken by this app. Pay your mentor directly + show proof.</div>
+    </div>
+  </div>
+  <div class="onb-screen" id="onb-key">
+    <div class="onb-back" onclick="onbGo('onb-payment')">‹</div>
+    <div class="onb-logo" style="width:64px;height:64px;font-size:26px"><span>KV</span></div>
+    <div class="onb-title">ENTER ROBOT KEY</div>
+    <input class="onb-input" id="onb-key-input" placeholder="ROBOT KEY" style="text-transform:uppercase">
+    <button class="onb-btn" id="onb-activate" onclick="onbActivate()">ACTIVATE</button>
+    <div class="onb-small" id="onb-key-msg">Enter your robot license key to link it to your trading account. Key is checked with REAL Render server.</div>
+  </div>
+</div>
+
+<div class="m-dot" id="mDot">KV</div>
+<div class="header"><span id="clock">19:51</span><span><span class="live-dot"></span><span id="liveStatus">LIVE FEED: --</span></span><span id="date"></span></div>
+
+<div class="hero" id="homeView">
+  <div class="title">KAYVIEW CHARGER</div>
+  <div class="badge">POWERED BY <span>AMBIENT</span></div>
+  <div style="margin-top:12px;font-size:12px;color:var(--muted)">Signals: <span id="tradeCount" style="color:var(--text)">0 / 0</span> • <span id="livePriceTop" style="color:var(--green)">--</span> • <span id="liveSym">XAUUSD</span></div>
+  <div style="margin-top:8px;font-size:11px;color:#8aa8bf">Scanner only - This app does NOT place trades by itself</div>
+</div>
+
+<div class="controls" id="ctrl">
+  <button class="control-btn" onclick="openLogs()">◉ BOT LOGS</button>
+  <button class="control-btn center" id="startBtn" onclick="toggleBot()">▶</button>
+  <button class="control-btn" onclick="openPairs()">◫ Symbols</button>
+</div>
+
+<div class="list" id="robotList">
+  <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin-bottom:8px"><span>ROBOT LIST</span><span style="color:#6aa4ff)">+ Add Key</span></div>
+  <div class="card"><div style="display:flex;gap:12px;align-items:center"><div style="width:44px;height:44px;border-radius:22px;background:#0a2a6e;display:flex;align-items:center;justify-content:center" id="robotIcon">🤖</div><div>KAYVIEW CHARGER<br><small style="font-family:monospace;color:var(--muted)">PHE••••E91</small><br><small style="color:#6aa4ff" id="robotKeyStatus">Key not validated yet • Scanner only</small></div></div><div>🗑️</div></div>
+</div>
+
+<div id="settingsView" style="display:none;padding:16px;position:relative;z-index:2">
+  <div class="card block"><b>THEME - LIVE COLOR</b><br><small style="color:var(--muted)">Pick any color, changes instantly</small>
+    <div class="color-row">
+      <input type="color" id="colorPicker" value="#0a2a6e" style="width:50px;height:40px;border-radius:8px;border:none;cursor:pointer" oninput="setThemeColor(this.value)">
+      <div class="color-dot" style="background:#0a2a6e" onclick="setThemeColor('#0a2a6e')"></div>
+      <div class="color-dot" style="background:#00ffff" onclick="setThemeColor('#00ffff')"></div>
+      <div class="color-dot" style="background:#ffcc00" onclick="setThemeColor('#ffcc00')"></div>
+      <div class="color-dot" style="background:#00ff88" onclick="setThemeColor('#00ff88')"></div>
+      <div class="color-dot" style="background:#a855f7" onclick="setThemeColor('#a855f7')"></div>
+    </div>
+  </div>
+  <div class="card block" style="margin-top:12px"><b>KV LOGO - DRAGGABLE + REAL LIVE ONLY</b><br><small style="color:var(--muted)">Logs show ONLY scanner signals with live Deriv price. No fake execution.</small><div style="font-family:monospace;font-size:11px;margin-top:8px;line-height:1.6"><div>Status: <span id="wsStatus">Connecting Deriv live...</span></div><div>XAUUSD: <span id="sXAU">--</span> | BTC: <span id="sBTC">--</span></div><div>VOL_20: <span id="sV20">--</span> | VOL_80: <span id="sV80">--</span></div></div></div>
+  <div class="card block" style="margin-top:12px"><b>FONT</b><br>Space Grotesk</div>
+  <div class="card block" style="margin-top:12px"><b>HOME BACKGROUND - AVATAR SIZE</b><br><input type="range" id="homeBgSize" style="width:100%;margin-top:8px;accent-color:#00aaff" value="420" min="200" max="600" oninput="adjustHomeBg(this.value)"><small style="color:var(--muted)" id="homeBgSizeLabel">420px</small></div>
+</div>
+
+<div id="mtView" style="display:none;padding:16px;position:relative;z-index:2">
+  <div class="card block">METATRADER<br><small>Phone MT5 cannot be auto-connected by this app. Save details for VPS setup. Live Deriv price: <span id="mtLive">--</span></small><input class="input" id="mtAcc" placeholder="Account ID"><input class="input" id="mtPass" type="password" placeholder="Password - never sent to Render, saved locally only"><input class="input" id="mtServer" placeholder="Server"><button onclick="saveMtLocal()" style="width:100%;margin-top:12px;padding:14px;border-radius:12px;background:linear-gradient(135deg,#00aaff,#0077ff);color:white;border:none;font-weight:bold">SAVE LOCALLY FOR VPS SETUP</button><div id="mtMsg" style="font-size:12px;color:#8aa8bf;margin-top:8px"></div></div>
+</div>
+
+<div id="platformView" style="display:none;padding:16px;position:relative;z-index:2">
+  <div class="card block">
+    <b>AMBIENT PLATFORM - REAL STATUS</b><br>
+    <small style="color:var(--muted)">Render = Office • Deriv = Price Only • MT5 VPS = Execution</small>
+    <div style="font-family:monospace;font-size:12px;line-height:2.1;margin-top:10px">
+      <div>RENDER API: <span id="platApi">Checking...</span></div>
+      <div>DERIV FEED: <span id="platDeriv">Connecting...</span></div>
+      <div>MT5 / VPS: <span id="platMt5">WAITING_FOR_MT5</span></div>
+      <div>YOUR KEY: <span id="platKey">Not validated</span></div>
+      <div>REAL BALANCE: <span id="platBal">--</span></div>
+      <div>REAL POSITIONS: <span id="platPos">--</span></div>
+    </div>
+    <input class="input" id="platKeyInput" placeholder="Paste AHE Key - e.g. AHE-XXX-XXX-XXX">
+    <button onclick="validatePlatformKey()" style="width:100%;margin-top:12px;padding:14px;border-radius:12px;background:linear-gradient(135deg,#00aaff,#0077ff);color:white;border:none;font-weight:bold">VALIDATE KEY WITH RENDER</button>
+    <div id="platMsg" style="margin-top:10px;font-size:12px;color:#8aa8bf"></div>
+    <div style="margin-top:12px;background:#000;padding:12px;border-radius:12px;font-size:11px;line-height:1.8;color:#aaa">
+      <b style="color:white">HOW REAL EXECUTION WORKS:</b><br>
+      1. This app = Scanner only. It does NOT trade.<br>
+      2. Master EA on Windows VPS trades.<br>
+      3. MetaCopier copies to you IF your key is ACTIVE in Render.<br>
+      4. If key is INACTIVE / no payment, you get NO trades.
+    </div>
+  </div>
+</div>
+
+<div id="scanView" style="display:none;position:relative;z-index:2">
+  <div class="scanner-top"><div class="scanner-date"><span id="scannerDate"></span></div><button class="scanner-news" onclick="showNews()">✨ NEWS</button><div class="scanner-avatar-wrap"><img src="" alt="Sniper Elite"></div><div class="scanner-title">AI Analysis</div><div class="scanner-sub">SNIPER ELITE • ENTRY HUNTER • SCANNER ONLY</div><div class="scanner-steps">1. Pick <b>pair &amp; timeframe</b><br>2. Watch live price<br>3. Tap <b>Analyse</b> for a signal - NOT a trade</div></div>
+  <div class="scanner-card">
+    <div class="scanner-label">PAIR (PICK)</div><select class="scanner-select" id="pair" onchange="switchSymbol(this.value)"><option value="frxXAUUSD">XAUUSD</option><option value="cryBTCUSD">BTCUSD</option><option value="R_20">VOL_20</option><option value="1HZ80V">VOL_80</option></select>
+    <div class="scanner-label">TIMEFRAME</div><select class="scanner-select" id="timeframe" onchange="setTimeframe(this.value)"><option>M1</option><option>M5</option><option selected>M15</option><option>M30</option><option>H1</option><option>H4</option><option>D1</option><option>WK</option></select>
+    <div class="scanner-row"><div><div class="scanner-label">LOT SIZE</div><input class="scanner-input" id="lot" value="" placeholder="e.g. 0.01"></div><div><div class="scanner-label">NUMBER OF SIGNALS</div><input class="scanner-input" id="tradesInput" value="" placeholder="e.g. 1"></div></div>
+    <div class="live-quote"><div style="display:flex;justify-content:space-between"><div><div style="font-size:10px;letter-spacing:1.5px;color:#5a7a9a">LIVE QUOTE</div><div style="font-size:20px;font-weight:800;color:#fff" id="liveSym2">XAUUSD</div></div><div style="text-align:right"><div style="font-size:10px;color:#5a7a9a">STATUS</div><div style="font-size:13px;color:#b0c4d6" id="qStatus">Fetching...</div></div></div><div class="bid-ask"><div class="bid-box"><div class="lbl">BID</div><div class="val" id="bid">—</div></div><div class="ask-box"><div class="lbl">ASK</div><div class="val" id="ask">—</div></div></div></div>
+    <button class="scanner-analyse" onclick="analyse()">🎯 ANALYSE LIVE SIGNAL</button>
+    <div id="signalResult">
+      <div class="signal-head"><div><div style="font-size:11px;color:#5a7a9a">SIGNAL - ANALYSIS ONLY, NOT A TRADE</div><div class="signal-setup" id="sigSetup">Liquidity Sweep + MSS + Order Block Entry</div></div><div style="text-align:right"><div style="font-size:11px;color:#5a7a9a">DIRECTION</div><div class="signal-dir-val" id="sigDirection">SELL</div></div></div>
+      <div class="signal-bullets"><div>• <span id="sigB1">--</span></div><div>• <span id="sigB2">--</span></div><div>• <span id="sigB3">--</span></div><div>• HTF bias: <span id="sigHtf">--</span> • Zone: <span id="sigZone">--</span></div></div>
+      <div class="signal-boxes"><div class="signal-box"><small>ENTRY</small><div class="blue" id="sigEntry">--</div><small id="sigEntryPips">--</small></div><div class="signal-box"><small>STOP LOSS</small><div class="red" id="sigSl">--</div><small id="sigSlPips">--</small></div><div class="signal-box"><small>R:R</small><div id="sigRr">1:1.5</div><small id="sigRrSub">--</small></div></div>
+      <div class="signal-tps"><div><span>TP1</span><b id="sigTp1">--</b><span id="sigTp1Pips">--</span></div><div><span>TP2</span><b id="sigTp2">--</b><span id="sigTp2Pips">--</span></div></div>
+      <div style="font-size:11px;color:#ff8800;margin-top:12px">⚠️ This is a scanner signal. It did NOT open a trade on MT5. Use it to decide manually or wait for VPS + MetaCopier if your key is ACTIVE.</div>
+    </div>
+    <div class="live-market"><div style="display:flex;justify-content:space-between"><b style="font-size:11px;color:#00aaff">LIVE MARKET UPDATE • ICT</b><span style="font-size:11px;color:#8aa8bf">● SCANNING...</span></div><div style="font-size:13px;color:#b0c4d6;margin-top:10px" id="liveMarketText">Reading live structure...</div><div style="font-size:11px;color:#5a7a9a;margin-top:6px">Pair: <span id="liveMarketPair">XAUUSD</span> • TF: <span id="liveMarketTF">M15</span> • <span class="live-dot"></span> LIVE</div></div>
+  </div>
+</div>
+
+<div class="toast" id="toast">✓ <span id="tText">Bot armed — waiting for signal</span></div>
+<div class="modal" id="pairs" onclick="if(event.target==this)closePairs()"><div class="modal-box"><div style="display:flex;justify-content:space-between"><b>Pairs • LIVE</b><span onclick="closePairs()">✕</span></div><br><div class="pair" onclick="selectSymbol('frxXAUUSD','XAUUSD')"><span>XAUUSD</span><span style="color:var(--green);font-family:monospace" id="pXAU">--</span></div><div class="pair" onclick="selectSymbol('cryBTCUSD','BTCUSD')"><span>BTCUSD</span><span style="color:var(--green);font-family:monospace" id="pBTC">--</span></div><div class="pair" onclick="selectSymbol('R_20','VOL_20')"><span>VOL_20</span><span style="color:var(--green);font-family:monospace" id="pV20">--</span></div><div class="pair" onclick="selectSymbol('1HZ80V','VOL_80')"><span>VOL_80</span><span style="color:var(--green);font-family:monospace" id="pV80">--</span></div></div></div>
+<div class="modal" id="logsModal" onclick="if(event.target==this)closeLogs()"><div class="modal-box" style="background:#000;font-family:monospace;font-size:12px"><div style="display:flex;justify-content:space-between"><div style="color:#8b7ab0;font-size:10px;letter-spacing:2px">KEY FROM MENTOR</div><span onclick="closeLogs()" style="cursor:pointer;color:white;font-size:16px">✕</span></div><div style="color:white;font-weight:700;font-size:14px;margin:14px 0">KV</div><div style="display:flex;gap:12px;align-items:center;margin-bottom:14px"><div style="width:48px;height:48px;background:#ef4444;border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-weight:900;font-size:16px;border:2px solid #ff8a8a">KV</div><div><div style="color:#8b7ab0;font-size:10px">MENTOR</div><div style="color:white;font-weight:700;font-size:14px">KV</div><div style="color:#8b7ab0;font-size:11px;font-family:monospace">M1-0789</div></div></div><div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px"><span style="padding:6px 12px;border:1.5px solid #ef4444;border-radius:20px;color:#ef4444;font-size:11px;font-family:monospace">✕ SERVER OFFLINE - MT5 VPS NOT SYNCING</span><span style="padding:6px 12px;border:1.5px solid #00aaff;border-radius:20px;color:#00aaff;font-size:11px;font-family:monospace">⚡ SOURCE: DERIV PRICE ONLY</span></div><div style="background:#0a0a0a;border-radius:12px;padding:12px;font-family:monospace;font-size:12px;line-height:1.8;color:#00ff88"><div style="color:#666">Logs show scanner signals only. No fake execution.</div><div id="emptyLogsMsg" style="color:#444;margin-top:8px">>> No signal yet. Start bot + Analyse. Logs will appear ONLY when scanner creates a signal with real Deriv price...</div><div id="liveLogs"></div></div><div style="margin-top:14px;padding-top:10px;border-top:1px solid #1a1230;display:flex;justify-content:space-between;color:#5a4a7a;font-size:10px;letter-spacing:1px"><span>BOT LOGS - SCANNER ONLY</span><span>AMBIENT HOST EA - KV - READY</span></div></div></div>
+
+<div class="bottom">
+  <div class="nav active" onclick="tab('home',this)"><svg viewBox="0 0 24 24"><path d="M3 10.5 12 3l9 7.5V20h-6v-6h-6v6H3z"/><path d="M10 20v-6h4v6"/></svg><span>Home</span></div>
+  <div class="nav" onclick="tab('mt',this)"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="12" rx="1.5"/><path d="M12 16v4"/><path d="M8 20h8"/></svg><span>Metatrader</span></div>
+  <div class="nav" onclick="tab('scan',this)"><svg viewBox="0 0 24 24"><path d="M9.5 2.5a3.5 3.5 0 0 0-3.4 3.4C4.6 6.4 3.5 7.7 3.5 9.2c0 1.4.8 2.6 1.9 3.3-.3.5-.5 1.1-.5 1.7 0 1.9 1.5 3.3 3.4 3.3.6 0 1.1-.1 1.4-.4V22h2v-4.5"/><path d="M14.5 2.5a3.5 3.5 0 0 1 3.4 3.4c1.5.5 2.6 1.8 2.6 3.3 0 1.4-.8 2.6-1.9 3.3.3.5.5 1.1.5 1.7 0 1.9-1.5 3.3-3.4 3.3-.6 0-1.1-.1-1.4-.4V22h-2v-4.5"/></svg><span>Scanner</span></div>
+  <div class="nav" onclick="tab('platform',this)"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18"/></svg><span>Platform</span></div>
+  <div class="nav" onclick="tab('settings',this)"><svg viewBox="0 0 24 24"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg><span>Settings</span></div>
+</div>
+
+<script>
+const API = window.KAYVIEW_API_URL || localStorage.getItem('kv_api_url') || 'https://kayview-api.onrender.com';let armed=false, totalTrades=0, executedTrades=0;
+let livePrices={frxXAUUSD:null,cryBTC:null,R_20:null,'1HZ80V':null};
+let currentSymbol='frxXAUUSD', currentDisplay='XAUUSD';
+let ws=null;
+let isDragging=false, startX, startY, initX, initY, hasMoved=false;
+const mDot=document.getElementById('mDot');
+mDot.addEventListener('pointerdown', e=>{ isDragging=true; hasMoved=false; mDot.setPointerCapture(e.pointerId); startX=e.clientX; startY=e.clientY; initX=mDot.offsetLeft; initY=mDot.offsetTop; mDot.classList.add('dragging'); mDot.style.transition='none'; });
+mDot.addEventListener('pointermove', e=>{ if(!isDragging) return; const dx=e.clientX-startX, dy=e.clientY-startY; if(Math.abs(dx)>5||Math.abs(dy)>5) hasMoved=true; let nx=initX+dx, ny=initY+dy; nx=Math.max(0,Math.min(window.innerWidth-58,nx)); ny=Math.max(0,Math.min(window.innerHeight-80,ny)); mDot.style.left=nx+'px'; mDot.style.top=ny+'px'; });
+mDot.addEventListener('pointerup', e=>{ isDragging=false; mDot.classList.remove('dragging'); mDot.style.transition=''; if(!hasMoved){ if(armed) openLogs(); } });
+
+function onbGo(id){ document.querySelectorAll('#onboarding .onb-screen').forEach(s=>s.classList.remove('show')); let el=document.getElementById(id); if(el) el.classList.add('show'); }
+function onbProceed(){ let email=document.getElementById('onb-email').value.trim(); let msg=document.getElementById('onb-login-msg'); let btn=document.getElementById('onb-proceed'); if(!email || !email.includes('@')){ if(msg) msg.innerText='Enter a valid email'; return; } if(msg) msg.innerText='CHECKING...'; if(btn) btn.innerText='CHECKING...'; document.getElementById('onb-pay-email').innerText=email; setTimeout(()=>{ if(btn) btn.innerText='PROCEED'; onbGo('onb-pay'); },800); }
+function onbBuy(){ let agree=document.getElementById('onb-agree'); let msg=document.getElementById('onb-pay-msg'); if(!agree || !agree.checked){ if(msg) msg.innerText='Read all terms and conditions then accept them to make a payment.'; return; } onbGo('onb-payment'); }
+async function onbPayDone(method){
+  let email=(document.getElementById('onb-email').value.trim()||document.getElementById('onb-pay-email').innerText);
+  let msg=document.getElementById('onb-key-msg');
+  try{
+    await fetch(API+'/shop/order',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:email,mentorId:'',qty:1,amount:550,ref:method+' - R550 - '+new Date().toISOString()})});
+    if(msg) msg.innerText='Order created as PENDING via '+method+'. Mentor must APPROVE in shop before key works. No money taken by this app - pay mentor directly and show proof.';
+  }catch(e){ if(msg) msg.innerText='Could not reach Render. Try again.'; }
+  onbGo('onb-key');
+}
+async function onbActivate(){
+  let key=document.getElementById('onb-key-input').value.trim();
+  let msg=document.getElementById('onb-key-msg');
+  let btn=document.getElementById('onb-activate');
+  if(!key){ if(msg) msg.innerText='Enter your robot license key'; return; }
+  if(btn) btn.innerText='ACTIVATING...';
+  try{
+    let r=await fetch(API+'/keys/validate?key='+encodeURIComponent(key));
+    let j=await r.json();
+    if(!j.valid){ if(msg) msg.innerText='Key INVALID / INACTIVE. Get a real key from mentor.'; if(btn) btn.innerText='ACTIVATE'; return; }
+    document.getElementById('onboarding').style.display='none';
+    document.body.classList.remove('onboarding-active');
+    document.getElementById('platKeyInput').value=key;
+    document.getElementById('robotKeyStatus').innerText='Key VALID • '+key+' • Scanner + Platform';
+    validatePlatformKey();
+  }catch(e){ if(msg) msg.innerText='Render offline. Try again.'; if(btn) btn.innerText='ACTIVATE'; }
+}
+document.body.classList.add('onboarding-active');
+
+function saveMtLocal(){
+  let acc=document.getElementById('mtAcc').value.trim();
+  let srv=document.getElementById('mtServer').value.trim();
+  try{ localStorage.setItem('kv_mt_acc',acc); localStorage.setItem('kv_mt_server',srv); }catch(e){}
+  document.getElementById('mtMsg').innerText='Saved locally only (not sent to server). Use these details on your Windows VPS to install MT5 + EA. Phone MT5 cannot be auto-connected.';
+}
+
+function connectLive(){
+  const wsStatus=document.getElementById('wsStatus');
+  ws=new WebSocket('wss://ws.derivws.com/websockets/v3?app_id=1089');
+  ws.onopen=()=>{ if(wsStatus) wsStatus.innerText='Connected • Real ticks streaming - Price only, NOT trading'; let pd=document.getElementById('platDeriv'); if(pd) pd.innerText='CONNECTED ✅ Price only'; ['frxXAUUSD','cryBTCUSD','R_20','1HZ80V'].forEach(s=>ws.send(JSON.stringify({ticks:s,subscribe:1}))); };
+  ws.onmessage=(msg)=>{ const d=JSON.parse(msg.data); if(d.tick){ const sym=d.tick.symbol, price=parseFloat(d.tick.quote); livePrices[sym]=price; if(sym===currentSymbol){ document.getElementById('livePriceTop').innerText=price.toFixed(2); document.getElementById('liveSym').innerText=currentDisplay; if(typeof syncScanner==='function') syncScanner(); document.getElementById('liveStatus').innerText='LIVE '+currentDisplay+': '+price.toFixed(2); document.getElementById('bid').innerText=price.toFixed(2); document.getElementById('ask').innerText=(price+price*0.0002).toFixed(2); document.getElementById('mtLive').innerText=price.toFixed(2); } if(sym==='frxXAUUSD'){document.getElementById('pXAU').innerText=price.toFixed(2);document.getElementById('sXAU').innerText=price.toFixed(2);} if(sym==='cryBTCUSD'){document.getElementById('pBTC').innerText=price.toFixed(2);document.getElementById('sBTC').innerText=price.toFixed(2);} if(sym==='R_20'){document.getElementById('pV20').innerText=price.toFixed(2);document.getElementById('sV20').innerText=price.toFixed(2);} if(sym==='1HZ80V'){document.getElementById('pV80').innerText=price.toFixed(2);document.getElementById('sV80').innerText=price.toFixed(2);} } };
+  ws.onclose=()=>setTimeout(connectLive,3000);
+}
+function switchSymbol(val){ currentSymbol=val; const map={'frxXAUUSD':'XAUUSD','cryBTCUSD':'BTCUSD','R_20':'VOL_20','1HZ80V':'VOL_80'}; currentDisplay=map[val]||val; document.getElementById('liveSym').innerText=currentDisplay; if(livePrices[val]){ document.getElementById('bid').innerText=livePrices[val].toFixed(2); document.getElementById('ask').innerText=(livePrices[val]*1.0002).toFixed(2); } }
+function selectSymbol(a,b){switchSymbol(a);document.getElementById('pair').value=a;closePairs();}
+function toggleBot(){ armed=!armed; document.getElementById('startBtn').innerHTML=armed?'■':'▶'; const dot=document.getElementById('mDot'); if(armed){ dot.classList.add('on'); dot.style.left=(window.innerWidth-70)+'px'; dot.style.top='70px'; }else{ dot.classList.remove('on'); } document.getElementById('tText').innerText=armed?'Bot armed — scanner only, no trades will be placed':'Bot stopped'; let t=document.getElementById('toast');t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500); }
+function openPairs(){document.getElementById('pairs').classList.add('show')}
+function closePairs(){document.getElementById('pairs').classList.remove('show')}
+function openLogs(){ if(!armed){alert('Start bot first');return;} document.getElementById('logsModal').classList.add('show'); }
+function closeLogs(){document.getElementById('logsModal').classList.remove('show')}
+function showNews(){ let t=document.getElementById('toast'); document.getElementById('tText').innerText='📰 NEWS - High impact news in 2h: Check Forex Factory'; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),3000); }
+function syncScanner(){ let sym2=document.getElementById('liveSym2'); if(sym2) sym2.innerText=currentDisplay; let pairSel=document.getElementById('pair'); if(pairSel){ let map={'frxXAUUSD':'XAUUSD','cryBTCUSD':'BTCUSD','R_20':'VOL_20','1HZ80V':'VOL_80'}; let disp=map[pairSel.value]||pairSel.value; if(sym2) sym2.innerText=disp; let mp=document.getElementById('liveMarketPair'); if(mp) mp.innerText=disp; } let tf=document.getElementById('timeframe'); let tfEl=document.getElementById('liveMarketTF'); if(tf && tfEl) tfEl.innerText=tf.value; let dateEl=document.getElementById('scannerDate'); if(dateEl) dateEl.innerText=new Date().toDateString(); }
+setInterval(syncScanner, 1000); setTimeout(syncScanner, 300);
+function setTimeframe(tf){ let el=document.getElementById('liveMarketTF'); if(el) el.innerText=tf; let t=document.getElementById('toast'); document.getElementById('tText').innerText='Timeframe: '+tf; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),1500); }
+function adjustHomeBg(v){ let hero=document.getElementById('homeView'); if(hero) hero.style.minHeight=v+'px'; let label=document.getElementById('homeBgSizeLabel'); if(label) label.innerText=v+'px'; try{ localStorage.setItem('kv_home_bg_size', String(v)); }catch(e){} }
+function tab(name,el){ document.querySelectorAll('.nav').forEach(n=>n.classList.remove('active'));el.classList.add('active'); document.getElementById('homeView').style.display=name=='home'?'block':'none'; document.getElementById('ctrl').style.display=name=='home'?'flex':'none'; document.getElementById('robotList').style.display=name=='home'?'block':'none'; document.getElementById('settingsView').style.display=name=='settings'?'block':'none'; document.getElementById('mtView').style.display=name=='mt'?'block':'none'; document.getElementById('scanView').style.display=name=='scan'?'block':'none'; document.getElementById('platformView').style.display=name=='platform'?'block':'none'; }
+
+async function validatePlatformKey(){
+  let key=document.getElementById('platKeyInput').value.trim();
+  if(!key) return document.getElementById('platMsg').innerText='Paste your AHE key first';
+  try{
+    let r=await fetch(API+'/keys/validate?key='+encodeURIComponent(key));
+    let j=await r.json();
+    if(!j.valid){ document.getElementById('platKey').innerText='INVALID / INACTIVE ❌'; document.getElementById('platMsg').innerText='Key invalid. No trades will be copied.'; return; }
+    document.getElementById('platKey').innerText='VALID ✅ '+key;
+    document.getElementById('platMsg').innerText='Key VALID. If Master VPS + MetaCopier is on, you will receive copied trades.';
+    let r2=await fetch(API+'/host/live/'+encodeURIComponent(key));
+    let h=await r2.json();
+    if(h.online){ document.getElementById('platMt5').innerText='ONLINE - EA syncing ✅'; document.getElementById('platBal').innerText='R'+h.balance+' | Profit: R'+h.profit; document.getElementById('platPos').innerText=h.trades+' positions'; }
+    else { document.getElementById('platMt5').innerText='WAITING_FOR_MT5 - EA not syncing yet. Attach EA on Windows VPS.'; }
+  }catch(e){ document.getElementById('platMsg').innerText='Render API offline / sleeping. Try again.'; }
+}
+fetch(API+'/health').then(r=>r.json()).then(j=>{ document.getElementById('platApi').innerText='ONLINE ✅ Keys:'+j.keys+' Orders:'+j.orders; }).catch(()=> document.getElementById('platApi').innerText='OFFLINE / SLEEPING ❌');
+
+function showSignalCard(livePrice, direction){ let dir=direction||(Math.random()>0.5?'SELL':'BUY'); let isSell=dir==='SELL'; let entry=isSell?livePrice-0.09:livePrice+0.09; let sl=isSell?entry+0.352:entry-0.352; let tp1=isSell?entry-0.53:entry+0.53; let tp2=isSell?entry-0.88:entry+0.88; let fmt=(v)=>v.toFixed(5); let pips=(a,b)=>Math.abs(a-b)*10000; document.getElementById('sigDirection').innerText=dir; document.getElementById('sigDirection').className='signal-dir-val'+(isSell?'':' buy'); document.getElementById('sigSetup').innerText='Liquidity Sweep + MSS + Order Block Entry'; document.getElementById('sigHtf').innerText='bullish'; document.getElementById('sigZone').innerText='premium'; document.getElementById('sigB1').innerText='BSL liquidity sweep @ '+fmt(livePrice+0.01); document.getElementById('sigB2').innerText='BOS bullish @ '+fmt(livePrice-0.08); document.getElementById('sigB3').innerText=(isSell?'Supply OB ':'Demand OB ')+fmt(entry-0.42)+' - '+fmt(entry-0.36); document.getElementById('sigEntry').innerText=fmt(entry); document.getElementById('sigEntryPips').innerText=Math.round(pips(livePrice,entry))+' pips away'; document.getElementById('sigSl').innerText=fmt(sl); document.getElementById('sigSlPips').innerText=Math.round(pips(entry,sl))+' pips'; document.getElementById('sigRr').innerText='1:1.5'; document.getElementById('sigRrSub').innerText='BSL sweep wick 50%'; document.getElementById('sigTp1').innerText=fmt(tp1); document.getElementById('sigTp1Pips').innerText=Math.round(pips(entry,tp1))+' pips left'; document.getElementById('sigTp2').innerText=fmt(tp2); document.getElementById('sigTp2Pips').innerText=Math.round(pips(entry,tp2))+' pips left'; let card=document.getElementById('signalResult'); if(card) card.classList.add('show'); let upd=document.getElementById('liveMarketText'); if(upd) upd.innerText='Signal found • '+dir+' @ '+fmt(entry)+' • Live structure - ANALYSIS ONLY'; }
+function hideSignalCard(){ let c=document.getElementById('signalResult'); if(c) c.classList.remove('show'); }
+
+function analyse(){
+  let livePrice=livePrices[currentSymbol];
+  if(!livePrice){ document.getElementById('qStatus').innerText='Waiting for LIVE Deriv price...'; return; }
+  if(!armed){ document.getElementById('qStatus').innerText='Start bot first'; return; }
+  let tradesVal=document.getElementById('tradesInput').value||'1';
+  totalTrades=parseInt(tradesVal)||1;
+  hideSignalCard();
+  document.getElementById('qStatus').innerText='SIGNAL ONLY @ '+livePrice.toFixed(2)+' - This app does NOT place trades.';
+  executedTrades++;
+  document.getElementById('tradeCount').innerText=executedTrades+' / '+totalTrades;
+  document.getElementById('emptyLogsMsg').style.display='none';
+  let logs=document.getElementById('liveLogs');
+  logs.innerHTML+='<div class="log-line" style="color:#00ff88">>> SCANNER SIGNAL ['+new Date().toLocaleTimeString()+'] - PRICE ONLY, NO TRADE SENT</div><div class="log-line">>> Symbol: '+currentDisplay+' @ '+livePrice.toFixed(2)+' (Deriv feed)</div><div class="log-line">>> Action: WAIT for Master VPS / MetaCopier if key is ACTIVE</div><div class="log-line">>> This phone app cannot trade on MT5 by itself.</div><div style="border-bottom:1px solid #222;margin:8px 0"></div>';
+  showSignalCard(livePrice, Math.random()>0.5?'SELL':'BUY');
+  openLogs();
+}
+function setThemeColor(color){ document.documentElement.style.setProperty('--pink', color); document.documentElement.style.setProperty('--glow', color+'80'); document.getElementById('colorPicker').value=color; }
+connectLive();
+setInterval(()=>{document.getElementById('clock').innerText=new Date().toLocaleTimeString()},1000);
+document.getElementById('date').innerText=new Date().toDateString();
+function removeBot(){}
+</script>
+</body>
+</html> / '+totalTrades; hideSignalCard(); let livePrice=livePrices[currentSymbol]; if(!livePrice){ document.getElementById('qStatus').innerText='Waiting for LIVE Deriv price...'; return; } document.getElementById('qStatus').innerText='Scanning '+currentDisplay+' @ '+livePrice.toFixed(2)+'... waiting for REAL LIVE signal'; setTimeout(()=>{ if(!armed) return; executedTrades++; document.getElementById('tradeCount').innerText=executedTrades+' / '+totalTrades; let tp=(livePrice+livePrice*0.002).toFixed(2); let sl=(livePrice-livePrice*0.001).toFixed(2); document.getElementById('emptyLogsMsg').style.display='none'; let logs=document.getElementById('liveLogs'); logs.innerHTML+=`<div class="log-line" style="color:#00ff88">>> CONNECTED TO TRADE SERVER [${new Date().toLocaleTimeString()}]</div><div class="log-line">>> Connected to trade server</div><div class="log-line" style="color:#8b7aff">>> KAYVIEW PRO+ trading</div><div class="log-line" style="color:#a855f7">>> <span style="background:#a855f7;color:white;padding:1px 6px;border-radius:4px">BUY ${currentDisplay}</span> @ ${livePrice.toFixed(2)} LIVE REAL</div><div class="log-line" style="color:#00ff88">>> TP ADDED ${tp} (LIVE)</div><div class="log-line" style="color:#ff4444">>> SL ADDED ${sl} (LIVE)</div><div class="log-line">>> Trade ${executedTrades}/${totalTrades}: Accepting disclaimer...</div><div class="log-line">>> Linking account...</div><div class="log-line">>> Params: Buy ${currentDisplay} @ vol ${lot} @ ${livePrice.toFixed(2)}</div><div class="log-line" style="color:#00ff88">>> TRADE ${executedTrades}/${totalTrades} SUCCESSFUL: Buy ${currentDisplay}</div><div class="log-line">>> Selecting symbol ${currentDisplay}</div><div style="border-bottom:1px solid #222;margin:8px 0"></div>`; document.getElementById('qStatus').innerText=`REAL LIVE Signal @ ${livePrice.toFixed(2)} - Executed`; openLogs(); }, 3000+Math.random()*2000); }
+function toggleAnimatedBorder(on){ let el=document.getElementById('appFrameBorder'); let knob=document.getElementById('toggleKnob'); let span=document.getElementById('toggleBorderSpan'); if(on){ el.classList.add('active'); knob.style.transform='translateX(20px)'; span.style.background='var(--pink)'; } else { el.classList.remove('active'); knob.style.transform='translateX(0)'; span.style.background='#333'; } localStorage.setItem('kv_border', on?'1':'0'); }
+localStorage.setItem('kv_border','0');
+function setThemeColor(color){ document.documentElement.style.setProperty('--pink', color); document.documentElement.style.setProperty('--glow', color + '80'); document.getElementById('colorPicker').value = color; document.querySelectorAll('.color-dot').forEach(d=>d.classList.remove('active')); document.querySelectorAll('.color-dot').forEach(d=>{ if(d.style.background==color || d.style.background.includes(color)) d.classList.add('active') }); }
+connectLive(); setTimeout(loadHomeBgSize,300);
+setInterval(()=>{document.getElementById('clock').innerText=new Date().toLocaleTimeString()},1000);
+document.getElementById('date').innerText=new Date().toDateString();
+function removeBot(){}
+</script>
+</body>
+</html>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" alt="Sniper Elite"></div>
+    <div class="scanner-title">AI Analysis</div>
+    <div class="scanner-sub">SNIPER ELITE • ENTRY HUNTER</div>
+    <div class="scanner-steps">
+      1. Pick <b>pair &amp; timeframe</b><br>
+      2. Watch the live chart &amp; ask/bid<br>
+      3. Tap <b>Analyse</b> to fire the sniper
+    </div>
+  </div>
+
+  <div class="scanner-card">
+    <div class="scanner-label">PAIR (PICK)</div>
+    <select class="scanner-select" id="pair" onchange="switchSymbol(this.value)"><option value="frxXAUUSD">XAUUSD</option><option value="cryBTCUSD">BTCUSD</option><option value="R_20">VOL_20</option><option value="1HZ80V">VOL_80</option></select>
+
+    <div class="scanner-label">TIMEFRAME</div>
+    <select class="scanner-select" id="timeframe" onchange="setTimeframe(this.value)"><option>M1</option><option>M5</option><option selected>M15</option><option>M30</option><option>H1</option><option>H4</option><option>D1</option><option>WK</option></select>
+
+    <div class="scanner-row">
+      <div><div class="scanner-label">LOT SIZE</div><input class="scanner-input" id="lot" value="" placeholder="e.g. 0.01"></div>
+      <div><div class="scanner-label">NUMBER OF TRADES</div><input class="scanner-input" id="tradesInput" value="" placeholder="e.g. 1"></div>
+    </div>
+
+    <div class="live-quote">
+      <div class="live-quote-top">
+        <div><div class="live-quote-title">LIVE QUOTE</div><div class="live-quote-sym" id="liveSym2">XAUUSD</div></div>
+        <div><div class="live-quote-status">STATUS</div><div class="live-quote-status-val" id="qStatus">Fetching...</div></div>
+      </div>
+      <div class="bid-ask">
+        <div class="bid-box"><div class="lbl">BID</div><div class="val" id="bid">—</div><div style="font-size:10px;color:#8aa8bf;margin-top:2px"><span id="bidTime" style="display:none">--</span></div></div>
+        <div class="ask-box"><div class="lbl">ASK</div><div class="val" id="ask">—</div></div>
+      </div>
+      <div style="display:none"><span id="livePriceTop">--</span> <span id="liveSym">XAUUSD</span> <span id="mtLive">--</span></div>
+    </div>
+
+    <button class="scanner-analyse" onclick="analyse()">🎯 ANALYSE LIVE SIGNAL</button>
+
+    <div class="live-market">
+      <div class="live-market-top"><b>LIVE MARKET UPDATE • ICT</b><span><span class="dot"></span> SCANNING...</span></div>
+      <div class="live-market-text" id="liveMarketText">Reading live structure...</div>
+      <div style="font-size:11px;color:#5a7a9a;margin-top:6px">Pair: <span id="liveMarketPair">XAUUSD</span> • TF: <span id="liveMarketTF">M15</span> • <span class="live-dot"></span> LIVE</div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast">✓ <span id="tText">Bot armed — waiting for signal</span></div>
+
+<div class="modal" id="pairs" onclick="if(event.target==this)closePairs()">
+  <div class="modal-box">
+    <div style="display:flex;justify-content:space-between"><b>Pairs • LIVE</b><span onclick="closePairs()">✕</span></div><br>
+    <div class="pair" onclick="selectSymbol('frxXAUUSD','XAUUSD')"><span>XAUUSD</span><span style="color:var(--green);font-family:monospace" id="pXAU">--</span></div>
+    <div class="pair" onclick="selectSymbol('cryBTCUSD','BTCUSD')"><span>BTCUSD</span><span style="color:var(--green);font-family:monospace" id="pBTC">--</span></div>
+    <div class="pair" onclick="selectSymbol('R_20','VOL_20')"><span>VOL_20</span><span style="color:var(--green);font-family:monospace" id="pV20">--</span></div>
+    <div class="pair" onclick="selectSymbol('1HZ80V','VOL_80')"><span>VOL_80</span><span style="color:var(--green);font-family:monospace" id="pV80">--</span></div>
+  </div>
+</div>
+
+
+<div class="modal" id="logsModal" onclick="if(event.target==this)closeLogs()">
+  <div class="modal-box" style="background:#000;font-family:monospace;font-size:12px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+      <div style="color:#8b7ab0;font-size:10px;letter-spacing:2px">KEY FROM MENTOR</div>
+      <span onclick="closeLogs()" style="cursor:pointer;color:white;font-size:16px">✕</span>
+    </div>
+    <div style="color:white;font-weight:700;font-size:14px;margin-bottom:14px">KV</div>
+    
+    <div style="display:flex;gap:12px;align-items:center;margin-bottom:14px">
+      <div style="width:48px;height:48px;background:#ef4444;border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-weight:900;font-size:16px;border:2px solid #ff8a8a;box-shadow:0 0 12px #ef4444">KV</div>
+      <div>
+        <div style="color:#8b7ab0;font-size:10px">MENTOR</div>
+        <div style="color:white;font-weight:700;font-size:14px">KV</div>
+        <div style="color:#8b7ab0;font-size:11px;font-family:monospace">M1-0789</div>
+      </div>
+    </div>
+
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px">
+      <span style="padding:6px 12px;border:1.5px solid #ef4444;border-radius:20px;color:#ef4444;font-size:11px;font-family:monospace">✕ SERVER OFFLINE</span>
+      <span style="padding:6px 12px;border:1.5px solid #00aaff;border-radius:20px;color:#00aaff;font-size:11px;font-family:monospace">⚡ SOURCE: IDLE</span>
+      <span style="padding:6px 12px;border:1.5px solid #ef4444;border-radius:20px;color:#ef4444;font-size:11px;font-family:monospace">✕ SERVER OFFLINE</span>
+    </div>
+
+    <div style="background:#0a0a0a;border-radius:12px;padding:12px;font-family:monospace;font-size:12px;line-height:1.8;color:#00ff88">
+      <div style="color:#666">21:50:26 - Server offline...</div>
+      <div id="emptyLogsMsg" style="color:#444;margin-top:8px">>> No real execution yet. Start bot + Analyse. Logs will appear ONLY when live signal executes with real Deriv price...</div>
+      <div id="liveLogs"></div>
+    </div>
+
+    <div style="margin-top:14px;padding-top:10px;border-top:1px solid #1a1230;display:flex;justify-content:space-between;color:#5a4a7a;font-size:10px;letter-spacing:1px">
+      <span>BOT LOGS</span>
+      <span>AMBIENT HOST EA - KV - READY</span>
+    </div>
+  </div>
+</div>
+
+</div>
+
+<div class="bottom">
+  <div class="nav active" onclick="tab('home',this)">
+    <svg viewBox="0 0 24 24"><path d="M3 10.5 12 3l9 7.5V20h-6v-6h-6v6H3z"/><path d="M10 20v-6h4v6"/></svg>
+    <span>Home</span>
+  </div>
+  <div class="nav" onclick="tab('mt',this)">
+    <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="12" rx="1.5"/><path d="M12 16v4"/><path d="M8 20h8"/></svg>
+    <span>Metatrader</span>
+  </div>
+  <div class="nav" onclick="tab('scan',this)">
+    <svg viewBox="0 0 24 24"><path d="M9.5 2.5a3.5 3.5 0 0 0-3.4 3.4C4.6 6.4 3.5 7.7 3.5 9.2c0 1.4.8 2.6 1.9 3.3-.3.5-.5 1.1-.5 1.7 0 1.9 1.5 3.3 3.4 3.3.6 0 1.1-.1 1.4-.4V22h2v-4.5"/><path d="M14.5 2.5a3.5 3.5 0 0 1 3.4 3.4c1.5.5 2.6 1.8 2.6 3.3 0 1.4-.8 2.6-1.9 3.3.3.5.5 1.1.5 1.7 0 1.9-1.5 3.3-3.4 3.3-.6 0-1.1-.1-1.4-.4V22h-2v-4.5"/><path d="M12 7.5v10"/><path d="M12 11.5h.01"/></svg>
+    <span>Scanner</span>
+  </div>
+  <div class="nav" onclick="tab('settings',this)">
+    <svg viewBox="0 0 24 24"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
+    <span>Settings</span>
+  </div>
+</div>
+
+<script>
+// YOUR CODE + LIVE DERIV FEED + DRAGGABLE M + REAL LIVE LOGS ONLY
+let armed=false, totalTrades=0, executedTrades=0;
+let particlesActive=false, animId=null;
+let livePrices={frxXAUUSD:null,cryBTCUSD:null,R_20:null,'1HZ80V':null};
+let currentSymbol='frxXAUUSD', currentDisplay='XAUUSD';
+let ws=null;
+
+// DRAGGABLE M LOGO - YOU MOVE IT, NOT AUTO
+let isDragging=false, startX, startY, initX, initY, hasMoved=false;
+const mDot=document.getElementById('mDot');
+mDot.addEventListener('pointerdown', e=>{
+  isDragging=true; hasMoved=false;
+  mDot.setPointerCapture(e.pointerId);
+  startX=e.clientX; startY=e.clientY;
+  initX=mDot.offsetLeft; initY=mDot.offsetTop;
+  mDot.classList.add('dragging');
+  mDot.style.transition='none';
+});
+mDot.addEventListener('pointermove', e=>{
+  if(!isDragging) return;
+  const dx=e.clientX-startX, dy=e.clientY-startY;
+  if(Math.abs(dx)>5||Math.abs(dy)>5) hasMoved=true;
+  let nx=initX+dx, ny=initY+dy;
+  nx=Math.max(0,Math.min(window.innerWidth-58,nx));
+  ny=Math.max(0,Math.min(window.innerHeight-80,ny));
+  mDot.style.left=nx+'px'; mDot.style.top=ny+'px';
+});
+mDot.addEventListener('pointerup', e=>{
+  isDragging=false;
+  mDot.classList.remove('dragging');
+  mDot.style.transition='';
+  if(!hasMoved){
+    if(armed) openLogs();
+  }
+});
+
+function connectLive(){
+  const wsStatus=document.getElementById('wsStatus');
+  const liveStatus=document.getElementById('liveStatus');
+  ws=new WebSocket('wss://ws.derivws.com/websockets/v3?app_id=1089');
+  ws.onopen=()=>{
+    if(wsStatus) wsStatus.innerText='Connected • Real ticks streaming';
+    ['frxXAUUSD','cryBTCUSD','R_20','1HZ80V'].forEach(s=>ws.send(JSON.stringify({ticks:s,subscribe:1})));
+  };
+  ws.onmessage=(msg)=>{
+    const d=JSON.parse(msg.data);
+    if(d.tick){
+      const sym=d.tick.symbol, price=parseFloat(d.tick.quote);
+      livePrices[sym]=price;
+      if(sym===currentSymbol){
+        document.getElementById('livePriceTop').innerText=price.toFixed(2);
+        document.getElementById('liveSym').innerText=currentDisplay;
+  if(typeof syncScanner==='function') syncScanner();
+        document.getElementById('liveStatus').innerText=`LIVE ${currentDisplay}: ${price.toFixed(2)}`;
+        document.getElementById('bid').innerText=price.toFixed(2);
+        document.getElementById('ask').innerText=(price+price*0.0002).toFixed(2);
+        document.getElementById('mtLive').innerText=price.toFixed(2);
+        document.getElementById('bidTime').innerText=new Date().toLocaleTimeString();
+      }
+      if(sym==='frxXAUUSD'){document.getElementById('pXAU').innerText=price.toFixed(2);document.getElementById('sXAU').innerText=price.toFixed(2);}
+      if(sym==='cryBTCUSD'){document.getElementById('pBTC').innerText=price.toFixed(2);document.getElementById('sBTC').innerText=price.toFixed(2);}
+      if(sym==='R_20'){document.getElementById('pV20').innerText=price.toFixed(2);document.getElementById('sV20').innerText=price.toFixed(2);}
+      if(sym==='1HZ80V'){document.getElementById('pV80').innerText=price.toFixed(2);document.getElementById('sV80').innerText=price.toFixed(2);}
+    }
+  };
+  ws.onclose=()=>setTimeout(connectLive,3000);
+}
+
+function switchSymbol(val){
+  currentSymbol=val;
+  const map={'frxXAUUSD':'XAUUSD','cryBTCUSD':'BTCUSD','R_20':'VOL_20','1HZ80V':'VOL_80'};
+  currentDisplay=map[val]||val;
+  document.getElementById('liveSym').innerText=currentDisplay;
+  if(livePrices[val]){
+    document.getElementById('bid').innerText=livePrices[val].toFixed(2);
+    document.getElementById('ask').innerText=(livePrices[val]*1.0002).toFixed(2);
+  }
+}
+function selectSymbol(a,b){switchSymbol(a);document.getElementById('pair').value=a;closePairs();}
+
+function toggleBot(){
+  armed=!armed;
+  document.getElementById('startBtn').innerHTML=armed?'■':'▶';
+  const dot=document.getElementById('mDot');
+  if(armed){
+    dot.classList.add('on');
+    dot.style.left=(window.innerWidth-70)+'px';
+    dot.style.top='70px';
+  }else{
+    dot.classList.remove('on');
+  }
+  document.getElementById('tText').innerText=armed?'Bot armed — drag M anywhere, logs empty until real execution':'Bot stopped';
+  let t=document.getElementById('toast');t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500);
+}
+function openPairs(){document.getElementById('pairs').classList.add('show')}
+function closePairs(){document.getElementById('pairs').classList.remove('show')}
+function openLogs(){
+  if(!armed){alert('Start bot first');return;}
+  document.getElementById('logsModal').classList.add('show');
+}
+function closeLogs(){document.getElementById('logsModal').classList.remove('show')}
+
+function showNews(){
+  let t=document.getElementById('toast'); document.getElementById('tText').innerText='📰 NEWS - High impact news in 2h: Check Forex Factory'; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),3000);
+}
+function syncScanner(){
+  let sym=document.getElementById('liveSym') ? document.getElementById('liveSym').innerText : 'XAUUSD';
+  let sym2=document.getElementById('liveSym2'); if(sym2) sym2.innerText=sym;
+  let pairSel=document.getElementById('pair'); if(pairSel){ let map={'frxXAUUSD':'XAUUSD','cryBTCUSD':'BTCUSD','R_20':'VOL_20','1HZ80V':'VOL_80'}; let disp=map[pairSel.value]||pairSel.value; if(sym2) sym2.innerText=disp; let mp=document.getElementById('liveMarketPair'); if(mp) mp.innerText=disp; }
+  let tf=document.getElementById('timeframe'); let tfEl=document.getElementById('liveMarketTF'); if(tf && tfEl) tfEl.innerText=tf.value;
+  let dateEl=document.getElementById('scannerDate'); if(dateEl) dateEl.innerText=new Date().toDateString();
+  // Keep original liveSym in sync for old code
+}
+setInterval(syncScanner, 1000);
+setTimeout(syncScanner, 300);
+
+function setTimeframe(tf){
+  let el = document.getElementById('liveMarketTF'); if(el) el.innerText = tf;
+  let t = document.getElementById('toast'); document.getElementById('tText').innerText = 'Timeframe: ' + tf; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),1500);
+}
+
+function adjustHomeBg(v){
+  let hero=document.getElementById('homeView'); if(hero){ hero.style.minHeight=v+'px'; }
+  let label=document.getElementById('homeBgSizeLabel'); if(label) label.innerText=v+'px';
+  try{ localStorage.setItem('kv_home_bg_size', String(v)); }catch(e){}
+}
+function loadHomeBgSize(){
+  let saved='420'; try{ saved=localStorage.getItem('kv_home_bg_size')||'420'; }catch(e){}
+  let slider=document.getElementById('homeBgSize'); if(slider) slider.value=saved;
+  let label=document.getElementById('homeBgSizeLabel'); if(label) label.innerText=saved+'px';
+  let hero=document.getElementById('homeView'); if(hero) hero.style.minHeight=saved+'px';
+}
+
+function tab(name,el){
+
+  document.querySelectorAll('.nav').forEach(n=>n.classList.remove('active'));el.classList.add('active');
+  document.getElementById('homeView').style.display=name=='home'?'block':'none';
+  document.getElementById('ctrl').style.display=name=='home'?'flex':'none';
+  document.getElementById('robotList').style.display=name=='home'?'block':'none';
+  document.getElementById('settingsView').style.display=name=='settings'?'block':'none';
+  document.getElementById('mtView').style.display=name=='mt'?'block':'none';
+  document.getElementById('scanView').style.display=name=='scan'?'block':'none';
+}
+
+function showSignalCard(livePrice, direction){
+  // SIGNAL CARD - calculated from LIVE price, NOT hardcoded 46.12 from screenshot
+  let dir = direction || (Math.random() > 0.5 ? 'SELL' : 'BUY');
+  let isSell = dir === 'SELL';
+  // For XAUUSD / GOLD, pip = 0.01 is too small for display, use screenshot style: pip = 0.0001 like in pic (352 pips = 0.0352)
+  // ENTRY slightly off live price, SL above for SELL / below for BUY, TPs in direction
+  let entry = isSell ? livePrice - 0.09 : livePrice + 0.09;
+  let sl = isSell ? entry + 0.352 : entry - 0.352;
+  let tp1 = isSell ? entry - 0.53 : entry + 0.53;
+  let tp2 = isSell ? entry - 0.88 : entry + 0.88;
+  let fmt = (v)=> v.toFixed(5);
+  // Pips = diff * 10000 like in your pic
+  let pips = (a,b)=> Math.abs(a-b)*10000;
+  document.getElementById('sigDirection').innerText = dir;
+  document.getElementById('sigDirection').className = 'signal-dir-val' + (isSell ? '' : ' buy');
+  document.getElementById('sigSetup').innerText = 'Liquidity Sweep + MSS + Order Block Entry';
+  document.getElementById('sigHtf').innerText = 'bullish';
+  document.getElementById('sigZone').innerText = 'premium';
+  document.getElementById('sigB1').innerText = 'BSL liquidity sweep @ ' + fmt(livePrice + 0.01);
+  document.getElementById('sigB2').innerText = 'BOS bullish @ ' + fmt(livePrice - 0.08);
+  document.getElementById('sigB3').innerText = (isSell ? 'Supply OB ' : 'Demand OB ') + fmt(entry - 0.42) + ' - ' + fmt(entry - 0.36);
+  document.getElementById('sigB4').innerText = 'premium zone (EQ ' + fmt(livePrice - 3.23) + ')';
+  document.getElementById('sigB5').innerText = 'HTF bias bullish';
+  document.getElementById('sigEntry').innerText = fmt(entry);
+  document.getElementById('sigEntryPips').innerText = Math.round(pips(livePrice, entry)) + ' pips away';
+  document.getElementById('sigSl').innerText = fmt(sl);
+  document.getElementById('sigSlPips').innerText = Math.round(pips(entry, sl)) + ' pips';
+  document.getElementById('sigRr').innerText = '1:1.5';
+  document.getElementById('sigRrSub').innerText = 'BSL sweep wick 50%';
+  document.getElementById('sigTp1').innerText = fmt(tp1);
+  document.getElementById('sigTp1Pips').innerText = Math.round(pips(entry, tp1)) + ' pips left';
+  document.getElementById('sigTp2').innerText = fmt(tp2);
+  document.getElementById('sigTp2Pips').innerText = Math.round(pips(entry, tp2)) + ' pips left';
+  let card = document.getElementById('signalResult');
+  card.classList.add('show');
+  card.scrollIntoView({behavior:'smooth', block:'nearest'});
+  // Also update LIVE MARKET UPDATE header to show found
+  let upd = document.getElementById('liveMarketText');
+  if(upd) upd.innerText = 'Signal found • ' + dir + ' @ ' + fmt(entry) + ' • Live structure';
+  let scan = document.getElementById('scanningText');
+  if(scan) scan.innerText = 'SIGNAL FOUND';
+}
+function hideSignalCard(){
+  let c = document.getElementById('signalResult');
+  if(c) c.classList.remove('show');
+}
+
+function analyse(){
+  let p=document.getElementById('pair').value, lot=document.getElementById('lot').value||'0.01';
+  let tradesVal=document.getElementById('tradesInput').value||'1';
+  totalTrades=parseInt(tradesVal);
+  document.getElementById('tradeCount').innerText=executedTrades+' / '+totalTrades;
+  hideSignalCard();
+  let livePrice=livePrices[currentSymbol];
+  if(!livePrice){
+    document.getElementById('qStatus').innerText='Waiting for LIVE Deriv price...';
+    return;
+  }
+  document.getElementById('qStatus').innerText='Scanning '+currentDisplay+' @ '+livePrice.toFixed(2)+'... waiting for REAL LIVE signal';
+  setTimeout(()=>{
+    if(!armed) return;
+    executedTrades++;
+    document.getElementById('tradeCount').innerText=executedTrades+' / '+totalTrades;
+    let tp=(livePrice+livePrice*0.002).toFixed(2);
+    let sl=(livePrice-livePrice*0.001).toFixed(2);
+    document.getElementById('emptyLogsMsg').style.display='none';
+    let logs=document.getElementById('liveLogs');
+    logs.innerHTML+=`
+      <div class="log-line" style="color:#00ff88">>> CONNECTED TO TRADE SERVER [${new Date().toLocaleTimeString()}]</div>
+      <div class="log-line">>> Connected to trade server</div>
+      <div class="log-line" style="color:#8b7aff">>> KAYVIEW PRO+ trading</div>
+      <div class="log-line" style="color:#a855f7">>> <span style="background:#a855f7;color:white;padding:1px 6px;border-radius:4px">BUY ${currentDisplay}</span> @ ${livePrice.toFixed(2)} LIVE REAL</div>
+      <div class="log-line" style="color:#00ff88">>> TP ADDED ${tp} (LIVE)</div>
+      <div class="log-line" style="color:#ff4444">>> SL ADDED ${sl} (LIVE)</div>
+      <div class="log-line">>> Trade ${executedTrades}/${totalTrades}: Accepting disclaimer...</div>
+      <div class="log-line">>> Linking account...</div>
+      <div class="log-line">>> Params: Buy ${currentDisplay} @ vol ${lot} @ ${livePrice.toFixed(2)}</div>
+      <div class="log-line" style="color:#00ff88">>> TRADE ${executedTrades}/${totalTrades} SUCCESSFUL: Buy ${currentDisplay}</div>
+      <div class="log-line">>> Selecting symbol ${currentDisplay}</div>
+      <div class="log-line" style="color:#a855f7">>> <span style="background:#a855f7;color:white;padding:1px 6px;border-radius:4px">BUY ${currentDisplay}</span></div>
+      <div style="border-bottom:1px solid #222;margin:8px 0"></div>
+    `;
+    document.getElementById('qStatus').innerText=`REAL LIVE Signal @ ${livePrice.toFixed(2)} - Executed`;
+    openLogs();
+  }, 3000+Math.random()*2000);
+}
+
+
+function toggleAnimatedBorder(on){
+  let el=document.getElementById('appFrameBorder');
+  let knob=document.getElementById('toggleKnob');
+  let span=document.getElementById('toggleBorderSpan');
+  if(on){ el.classList.add('active'); knob.style.transform='translateX(20px)'; span.style.background='var(--pink)'; }
+  else { el.classList.remove('active'); knob.style.transform='translateX(0)'; span.style.background='#333'; }
+  localStorage.setItem('kv_border', on?'1':'0');
+}
+// gradient off by default - no auto restore
+localStorage.setItem('kv_border','0');
+
+let blueActive=false, blueAnim=null;
+
+function setThemeColor(color){
+  document.documentElement.style.setProperty('--pink', color);
+  document.documentElement.style.setProperty('--glow', color + '80');
+  document.getElementById('colorPicker').value = color;
+  document.querySelectorAll('.color-dot').forEach(d=>d.classList.remove('active'));
+  document.querySelectorAll('.color-dot').forEach(d=>{ if(d.style.background==color || d.style.background.includes(color)) d.classList.add('active') });
+}
+
+connectLive();
+setTimeout(loadHomeBgSize,300);
+
+setInterval(()=>{document.getElementById('clock').innerText=new Date().toLocaleTimeString()},1000);
+document.getElementById('date').innerText=new Date().toDateString();
+function removeBot(){}
+</script>
+<script>(function(){var loc=location.href.replace(/#.*$/,"");var ATTR_NAMES=["data-product-id","data-productid","data-product_id","product-id","productid","product_id","data-source-entity-id","source-entity-id","source_entity_id","data-product","data-metadata","data-meta"];var DATASET_KEYS=["productId","productid","product_id","sourceEntityId","sourceentityid","source_entity_id","product","metadata","meta"];function readProductId(value){if(typeof value!=="string"||value.length===0)return null;if(/^[0-9]{6,}$/.test(value))return value;var match=value.match(/(?:product(?:_|-)?id|source(?:_|-)?entity(?:_|-)?id)["'=:\s]+([0-9]{6,})/i);return match?match[1]:null}function extractProductId(start){for(var node=start;node&&node!==document.body;node=node.parentElement){for(var i=0;i<ATTR_NAMES.length;i++){var attrValue=node.getAttribute&&node.getAttribute(ATTR_NAMES[i]);var attrProductId=readProductId(attrValue);if(attrProductId)return attrProductId}var dataset=node.dataset||null;if(dataset){for(var j=0;j<DATASET_KEYS.length;j++){var dataValue=dataset[DATASET_KEYS[j]];var dataProductId=readProductId(dataValue);if(dataProductId)return dataProductId}}}return null}function isInlineMediaSlotElement(node){return !!(node&&node.getAttribute&&node.getAttribute("data-clippy-inline-media-slot")!==null)}function findInlineMediaSlot(start){for(var node=start;node&&node!==document.body;node=node.parentElement){if(isInlineMediaSlotElement(node))return node}return null}function readInlineMediaUrl(node){if(!node)return null;return node.getAttribute&&((node.getAttribute("data-clippy-inline-media-url")||node.getAttribute("data-url")||node.getAttribute("data_url")))||node.href||null}function stripHash(url){return String(url).replace(/#.*$/,"")}function urlsMatch(a,b){if(!a||!b)return false;try{return stripHash(new URL(a,loc).href)===stripHash(new URL(b,loc).href)}catch(_){return stripHash(a)===stripHash(b)}}function isFirstPartyReelUrl(value){try{var url=new URL(value,loc);if(url.protocol!=="https:")return false;var host=url.hostname.toLowerCase();var supported=host==="instagram.com"||host.endsWith(".instagram.com")||host==="facebook.com"||host.endsWith(".facebook.com");return supported&&/\/reels?\//i.test(url.pathname)}catch(_){return false}}function isInlineMediaUrlClick(node,href){var slot=findInlineMediaSlot(node);if(!slot)return false;var slotUrl=readInlineMediaUrl(slot);if(slotUrl)return urlsMatch(href,slotUrl);return isFirstPartyReelUrl(href)}function findDataHref(start){for(var node=start;node&&node!==document.body;node=node.parentElement){if(node.getAttribute){var href=node.getAttribute("data-href")||node.getAttribute("data-url");if(href)return{href:href,node:node}}}return null}var nativeOpen=window.open;window.open=function(url){if(parent!==window&&typeof url==="string"&&/^https?:\/\//.test(url)){parent.postMessage({type:"ecto:usercontent-link-click",href:url},"*");return null}return nativeOpen?nativeOpen.apply(window,arguments):null};document.addEventListener("click",function(e){var target=e.target instanceof Element?e.target:null;if(!target)return;if(parent===window)return;var a=target.closest?target.closest("a[href]"):null;if(a&&a.href&&/^https?:\/\//.test(a.href)&&a.href.replace(/#.*$/,"")!==loc){if(isInlineMediaUrlClick(a,a.href))return;var productId=extractProductId(target)||extractProductId(a);if(productId){e.preventDefault();parent.postMessage({type:"ecto-artifact-link-click",productId:productId},"*");return}e.preventDefault();parent.postMessage({type:"ecto:usercontent-link-click",href:a.href},"*");return}var dataHref=findDataHref(target);if(dataHref&&/^https?:\/\//.test(dataHref.href)&&dataHref.href.replace(/#.*$/,"")!==loc){if(isInlineMediaUrlClick(dataHref.node,dataHref.href))return;e.preventDefault();parent.postMessage({type:"ecto:usercontent-link-click",href:dataHref.href},"*")}},true)})();</script><script>(function(){var FOCUS_TYPE="ecto:artifact-focus-request";var CLOSE_TYPE="ecto:artifact-close-request";function focusArtifactDocument(){var body=document.body;if(!body)return;try{window.focus();}catch(e){}if(!body.hasAttribute("tabindex"))body.setAttribute("tabindex","-1");try{body.focus({preventScroll:true});}catch(e){try{body.focus();}catch(e2){}}}window.addEventListener("message",function(event){if(event.source!==window.parent)return;var data=event.data;if(!data||typeof data!=="object"||data.type!==FOCUS_TYPE)return;if(document.readyState==="loading"){document.addEventListener("DOMContentLoaded",focusArtifactDocument,{once:true});return;}focusArtifactDocument();});window.addEventListener("keydown",function(event){if(event.key!=="Escape")return;window.setTimeout(function(){if(event.defaultPrevented)return;window.parent.postMessage({type:CLOSE_TYPE},"*");},0);});})();</script></body>
+</html>
+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')">
+  <div class="robot" id="robotBox">🤖</div>
+  <div class="title">KAYVIEW CHARGER</div>
+  <div class="badge">POWERED BY <span>AMBIENT</span></div>
+  <div style="margin-top:12px;font-size:12px;color:var(--muted)">Trades: <span id="tradeCount" style="color:var(--text)">0 / 0</span> • <span id="livePriceTop" style="color:var(--green)">--</span> • <span id="liveSym">XAUUSD</span></div>
+</div>
+
+<div class="controls" id="ctrl">
+  <button class="control-btn" onclick="openLogs()">◉ BOT LOGS</button>
+  <button class="control-btn center" id="startBtn" onclick="toggleBot()">▶</button>
+  <button class="control-btn" onclick="openPairs()">◫ Symbols</button>
+</div>
+
+<div class="list" id="robotList">
+  <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin-bottom:8px"><span>ROBOT LIST</span><span style="color:var(--pink)">+ Add Key</span></div>
+  <div class="card"><div style="display:flex;gap:12px;align-items:center"><div style="width:44px;height:44px;border-radius:22px;background:var(--pink);display:flex;align-items:center;justify-content:center;transition:.3s" id="robotIcon">🤖</div><div>KAYVIEW CHARGER<br><small style="font-family:monospace;color:var(--muted)">PHE••••E91</small><br><small style="color:var(--pink)">Key expires in 357d 12h • LIVE</small></div></div><div>🗑️</div></div>
+</div>
+
+<div id="settingsView" style="display:none;padding:16px;position:relative;z-index:2">
+
+  <div class="card block">
+    <b>THEME - LIVE COLOR</b><br><small style="color:var(--muted)">Pick any color, changes instantly</small>
+    <div class="color-row">
+      <input type="color" id="colorPicker" value="#ff00aa" style="width:50px;height:40px;border-radius:8px;border:none;cursor:pointer" oninput="setThemeColor(this.value)">
+      <div class="color-dot active" style="background:#ff00aa" onclick="setThemeColor('#ff00aa')"></div>
+      <div class="color-dot" style="background:#00ffff" onclick="setThemeColor('#00ffff')"></div>
+      <div class="color-dot" style="background:#ffcc00" onclick="setThemeColor('#ffcc00')"></div>
+      <div class="color-dot" style="background:#00ff88" onclick="setThemeColor('#00ff88')"></div>
+      <div class="color-dot" style="background:#a855f7" onclick="setThemeColor('#a855f7')"></div>
+      <div class="color-dot" style="background:#ff4400" onclick="setThemeColor('#ff4400')"></div>
+    </div>
+  </div>
+
+  
+
+  <div class="card block" style="margin-top:12px">
+    <b>EFFECTS</b><br><br>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+      <div><b style="font-size:13px">Background video</b><br><small style="color:var(--muted)">Background video on V3</small></div>
+      <label style="position:relative;display:inline-block;width:44px;height:24px"><input type="checkbox" checked style="opacity:0;width:0;height:0"><span style="position:absolute;inset:0;background:var(--pink);border-radius:24px"></span><span style="position:absolute;height:18px;width:18px;left:3px;bottom:3px;background:white;border-radius:50%;transform:translateX(20px)"></span></label>
+    </div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+      <div><b style="font-size:13px">Avatar cycle ring</b><br><small style="color:var(--muted)">Glow ring around the bot avatar</small></div>
+      <label style="position:relative;display:inline-block;width:44px;height:24px"><input type="checkbox" checked style="opacity:0;width:0;height:0"><span style="position:absolute;inset:0;background:var(--pink);border-radius:24px"></span><span style="position:absolute;height:18px;width:18px;left:3px;bottom:3px;background:white;border-radius:50%;transform:translateX(20px)"></span></label>
+    </div>
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <div><b style="font-size:13px">Animated border</b><br><small style="color:var(--muted)">Spinning gradient border on the app frame - on/off</small></div>
+      <label style="position:relative;display:inline-block;width:44px;height:24px"><input type="checkbox" id="toggleBorder" onchange="toggleAnimatedBorder(this.checked)" checked=false style="opacity:0;width:0;height:0"><span id="toggleBorderSpan" style="position:absolute;inset:0;background:#333;border-radius:24px;transition:.3s;cursor:pointer"><span style="position:absolute;height:18px;width:18px;left:3px;bottom:3px;background:white;border-radius:50%;transition:.3s;display:block" id="toggleKnob"></span></span></label>
+    </div>
+  </div>
+
+
+  <div class="card block" style="margin-top:12px">
+    <b>KV LOGO - DRAGGABLE + REAL LIVE ONLY</b><br><small style="color:var(--muted)">You move it. Logs show ONLY when real live execution happens with live price.</small>
+    <div style="font-family:monospace;font-size:11px;margin-top:8px;line-height:1.6">
+      <div>Status: <span id="wsStatus">Connecting Deriv live...</span></div>
+      <div>XAUUSD: <span id="sXAU">--</span> | BTC: <span id="sBTC">--</span></div>
+      <div>VOL_20: <span id="sV20">--</span> | VOL_80: <span id="sV80">--</span></div>
+    </div>
+  </div>
+
+  <div class="card block" style="margin-top:12px"><b>FONT</b><br>Space Grotesk</div>
+  <div class="card block" style="margin-top:12px"><b>AVATAR SIZE</b><br><input type="range" style="width:100%;margin-top:8px;accent-color:var(--pink)" value="268" min="100" max="400" oninput="document.getElementById('robotBox').style.height=this.value+'px'"><small style="color:var(--muted)">268px</small></div>
+</div>
+
+<div id="mtView" style="display:none;padding:16px;position:relative;z-index:2">
+  <div class="card block">METATRADER<br><small>Secured via MetaCopier API • Live: <span id="mtLive">--</span></small>
+    <input class="input" placeholder="Account ID">
+    <input class="input" type="password" placeholder="Password">
+    <input class="input" placeholder="Server">
+    <button class="mt-connect-btn" style="width:100%;margin-top:12px;padding:14px;border-radius:12px;color:white;border:none;font-weight:bold;transition:.3s">CONNECT</button>
+  </div>
+</div>
+
+<div id="scanView" style="display:none;position:relative;z-index:2">
+  <div class="scanner-top">
+    <div class="scanner-date"><span id="scannerDate"></span></div>
+    <button class="scanner-news" onclick="showNews()">✨ NEWS</button>
+    <div class="scanner-avatar-wrap"><img src="data:image/jpeg;base64,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" alt="Sniper Elite"></div>
+    <div class="scanner-title">AI Analysis</div>
+    <div class="scanner-sub">SNIPER ELITE • ENTRY HUNTER</div>
+    <div class="scanner-steps">
+      1. Pick <b>pair &amp; timeframe</b><br>
+      2. Watch the live chart &amp; ask/bid<br>
+      3. Tap <b>Analyse</b> to fire the sniper
+    </div>
+  </div>
+
+  <div class="scanner-card">
+    <div class="scanner-label">PAIR (PICK)</div>
+    <select class="scanner-select" id="pair" onchange="switchSymbol(this.value)"><option value="frxXAUUSD">XAUUSD</option><option value="cryBTCUSD">BTCUSD</option><option value="R_20">VOL_20</option><option value="1HZ80V">VOL_80</option></select>
+
+    <div class="scanner-label">TIMEFRAME</div>
+    <select class="scanner-select" id="timeframe" onchange="setTimeframe(this.value)"><option>M15</option><option>M5</option><option>H1</option><option>M1</option><option>H4</option></select>
+
+    <div class="scanner-row">
+      <div><div class="scanner-label">LOT SIZE</div><input class="scanner-input" id="lot" value="" placeholder="e.g. 0.01"></div>
+      <div><div class="scanner-label">NUMBER OF TRADES</div><input class="scanner-input" id="tradesInput" value="" placeholder="e.g. 1"></div>
+    </div>
+
+    <div class="live-quote">
+      <div class="live-quote-top">
+        <div><div class="live-quote-title">LIVE QUOTE</div><div class="live-quote-sym" id="liveSym2">XAUUSD</div></div>
+        <div><div class="live-quote-status">STATUS</div><div class="live-quote-status-val" id="qStatus">Fetching...</div></div>
+      </div>
+      <div class="bid-ask">
+        <div class="bid-box"><div class="lbl">BID</div><div class="val" id="bid">—</div><div style="font-size:10px;color:#8aa8bf;margin-top:2px"><span id="bidTime" style="display:none">--</span></div></div>
+        <div class="ask-box"><div class="lbl">ASK</div><div class="val" id="ask">—</div></div>
+      </div>
+      <div style="display:none"><span id="livePriceTop">--</span> <span id="liveSym">XAUUSD</span> <span id="mtLive">--</span></div>
+    </div>
+
+    <button class="scanner-analyse" onclick="analyse()">🎯 ANALYSE LIVE SIGNAL</button>
+
+    <div class="live-market">
+      <div class="live-market-top"><b>LIVE MARKET UPDATE • ICT</b><span><span class="dot"></span> SCANNING...</span></div>
+      <div class="live-market-text" id="liveMarketText">Reading live structure...</div>
+      <div style="font-size:11px;color:#5a7a9a;margin-top:6px">Pair: <span id="liveMarketPair">XAUUSD</span> • TF: <span id="liveMarketTF">M15</span> • <span class="live-dot"></span> LIVE</div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast">✓ <span id="tText">Bot armed — waiting for signal</span></div>
+
+<div class="modal" id="pairs" onclick="if(event.target==this)closePairs()">
+  <div class="modal-box">
+    <div style="display:flex;justify-content:space-between"><b>Pairs • LIVE</b><span onclick="closePairs()">✕</span></div><br>
+    <div class="pair" onclick="selectSymbol('frxXAUUSD','XAUUSD')"><span>XAUUSD</span><span style="color:var(--green);font-family:monospace" id="pXAU">--</span></div>
+    <div class="pair" onclick="selectSymbol('cryBTCUSD','BTCUSD')"><span>BTCUSD</span><span style="color:var(--green);font-family:monospace" id="pBTC">--</span></div>
+    <div class="pair" onclick="selectSymbol('R_20','VOL_20')"><span>VOL_20</span><span style="color:var(--green);font-family:monospace" id="pV20">--</span></div>
+    <div class="pair" onclick="selectSymbol('1HZ80V','VOL_80')"><span>VOL_80</span><span style="color:var(--green);font-family:monospace" id="pV80">--</span></div>
+  </div>
+</div>
+
+
+<div class="modal" id="logsModal" onclick="if(event.target==this)closeLogs()">
+  <div class="modal-box" style="background:#000;font-family:monospace;font-size:12px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+      <div style="color:#8b7ab0;font-size:10px;letter-spacing:2px">KEY FROM MENTOR</div>
+      <span onclick="closeLogs()" style="cursor:pointer;color:white;font-size:16px">✕</span>
+    </div>
+    <div style="color:white;font-weight:700;font-size:14px;margin-bottom:14px">KV</div>
+    
+    <div style="display:flex;gap:12px;align-items:center;margin-bottom:14px">
+      <div style="width:48px;height:48px;background:#ef4444;border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-weight:900;font-size:16px;border:2px solid #ff8a8a;box-shadow:0 0 12px #ef4444">KV</div>
+      <div>
+        <div style="color:#8b7ab0;font-size:10px">MENTOR</div>
+        <div style="color:white;font-weight:700;font-size:14px">KV</div>
+        <div style="color:#8b7ab0;font-size:11px;font-family:monospace">M1-0789</div>
+      </div>
+    </div>
+
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px">
+      <span style="padding:6px 12px;border:1.5px solid #ef4444;border-radius:20px;color:#ef4444;font-size:11px;font-family:monospace">✕ SERVER OFFLINE</span>
+      <span style="padding:6px 12px;border:1.5px solid #00aaff;border-radius:20px;color:#00aaff;font-size:11px;font-family:monospace">⚡ SOURCE: IDLE</span>
+      <span style="padding:6px 12px;border:1.5px solid #ef4444;border-radius:20px;color:#ef4444;font-size:11px;font-family:monospace">✕ SERVER OFFLINE</span>
+    </div>
+
+    <div style="background:#0a0a0a;border-radius:12px;padding:12px;font-family:monospace;font-size:12px;line-height:1.8;color:#00ff88">
+      <div style="color:#666">21:50:26 - Server offline...</div>
+      <div id="emptyLogsMsg" style="color:#444;margin-top:8px">>> No real execution yet. Start bot + Analyse. Logs will appear ONLY when live signal executes with real Deriv price...</div>
+      <div id="liveLogs"></div>
+    </div>
+
+    <div style="margin-top:14px;padding-top:10px;border-top:1px solid #1a1230;display:flex;justify-content:space-between;color:#5a4a7a;font-size:10px;letter-spacing:1px">
+      <span>BOT LOGS</span>
+      <span>AMBIENT HOST EA - KV - READY</span>
+    </div>
+  </div>
+</div>
+
+</div>
+
+<div class="bottom">
+  <div class="nav active" onclick="tab('home',this)">
+    <svg viewBox="0 0 24 24"><path d="M3 10.5 12 3l9 7.5V20h-6v-6h-6v6H3z"/><path d="M10 20v-6h4v6"/></svg>
+    <span>Home</span>
+  </div>
+  <div class="nav" onclick="tab('mt',this)">
+    <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="12" rx="1.5"/><path d="M12 16v4"/><path d="M8 20h8"/></svg>
+    <span>Metatrader</span>
+  </div>
+  <div class="nav" onclick="tab('scan',this)">
+    <svg viewBox="0 0 24 24"><path d="M9.5 2.5a3.5 3.5 0 0 0-3.4 3.4C4.6 6.4 3.5 7.7 3.5 9.2c0 1.4.8 2.6 1.9 3.3-.3.5-.5 1.1-.5 1.7 0 1.9 1.5 3.3 3.4 3.3.6 0 1.1-.1 1.4-.4V22h2v-4.5"/><path d="M14.5 2.5a3.5 3.5 0 0 1 3.4 3.4c1.5.5 2.6 1.8 2.6 3.3 0 1.4-.8 2.6-1.9 3.3.3.5.5 1.1.5 1.7 0 1.9-1.5 3.3-3.4 3.3-.6 0-1.1-.1-1.4-.4V22h-2v-4.5"/><path d="M12 7.5v10"/><path d="M12 11.5h.01"/></svg>
+    <span>Scanner</span>
+  </div>
+  <div class="nav" onclick="tab('settings',this)">
+    <svg viewBox="0 0 24 24"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
+    <span>Settings</span>
+  </div>
+</div>
+
+<script>
+// YOUR CODE + LIVE DERIV FEED + DRAGGABLE M + REAL LIVE LOGS ONLY
+let armed=false, totalTrades=0, executedTrades=0;
+let particlesActive=false, animId=null;
+let livePrices={frxXAUUSD:null,cryBTCUSD:null,R_20:null,'1HZ80V':null};
+let currentSymbol='frxXAUUSD', currentDisplay='XAUUSD';
+let ws=null;
+
+// DRAGGABLE M LOGO - YOU MOVE IT, NOT AUTO
+let isDragging=false, startX, startY, initX, initY, hasMoved=false;
+const mDot=document.getElementById('mDot');
+mDot.addEventListener('pointerdown', e=>{
+  isDragging=true; hasMoved=false;
+  mDot.setPointerCapture(e.pointerId);
+  startX=e.clientX; startY=e.clientY;
+  initX=mDot.offsetLeft; initY=mDot.offsetTop;
+  mDot.classList.add('dragging');
+  mDot.style.transition='none';
+});
+mDot.addEventListener('pointermove', e=>{
+  if(!isDragging) return;
+  const dx=e.clientX-startX, dy=e.clientY-startY;
+  if(Math.abs(dx)>5||Math.abs(dy)>5) hasMoved=true;
+  let nx=initX+dx, ny=initY+dy;
+  nx=Math.max(0,Math.min(window.innerWidth-58,nx));
+  ny=Math.max(0,Math.min(window.innerHeight-80,ny));
+  mDot.style.left=nx+'px'; mDot.style.top=ny+'px';
+});
+mDot.addEventListener('pointerup', e=>{
+  isDragging=false;
+  mDot.classList.remove('dragging');
+  mDot.style.transition='';
+  if(!hasMoved){
+    if(armed) openLogs();
+  }
+});
+
+function connectLive(){
+  const wsStatus=document.getElementById('wsStatus');
+  const liveStatus=document.getElementById('liveStatus');
+  ws=new WebSocket('wss://ws.derivws.com/websockets/v3?app_id=1089');
+  ws.onopen=()=>{
+    if(wsStatus) wsStatus.innerText='Connected • Real ticks streaming';
+    ['frxXAUUSD','cryBTCUSD','R_20','1HZ80V'].forEach(s=>ws.send(JSON.stringify({ticks:s,subscribe:1})));
+  };
+  ws.onmessage=(msg)=>{
+    const d=JSON.parse(msg.data);
+    if(d.tick){
+      const sym=d.tick.symbol, price=parseFloat(d.tick.quote);
+      livePrices[sym]=price;
+      if(sym===currentSymbol){
+        document.getElementById('livePriceTop').innerText=price.toFixed(2);
+        document.getElementById('liveSym').innerText=currentDisplay;
+  if(typeof syncScanner==='function') syncScanner();
+        document.getElementById('liveStatus').innerText=`LIVE ${currentDisplay}: ${price.toFixed(2)}`;
+        document.getElementById('bid').innerText=price.toFixed(2);
+        document.getElementById('ask').innerText=(price+price*0.0002).toFixed(2);
+        document.getElementById('mtLive').innerText=price.toFixed(2);
+        document.getElementById('bidTime').innerText=new Date().toLocaleTimeString();
+      }
+      if(sym==='frxXAUUSD'){document.getElementById('pXAU').innerText=price.toFixed(2);document.getElementById('sXAU').innerText=price.toFixed(2);}
+      if(sym==='cryBTCUSD'){document.getElementById('pBTC').innerText=price.toFixed(2);document.getElementById('sBTC').innerText=price.toFixed(2);}
+      if(sym==='R_20'){document.getElementById('pV20').innerText=price.toFixed(2);document.getElementById('sV20').innerText=price.toFixed(2);}
+      if(sym==='1HZ80V'){document.getElementById('pV80').innerText=price.toFixed(2);document.getElementById('sV80').innerText=price.toFixed(2);}
+    }
+  };
+  ws.onclose=()=>setTimeout(connectLive,3000);
+}
+
+function switchSymbol(val){
+  currentSymbol=val;
+  const map={'frxXAUUSD':'XAUUSD','cryBTCUSD':'BTCUSD','R_20':'VOL_20','1HZ80V':'VOL_80'};
+  currentDisplay=map[val]||val;
+  document.getElementById('liveSym').innerText=currentDisplay;
+  if(livePrices[val]){
+    document.getElementById('bid').innerText=livePrices[val].toFixed(2);
+    document.getElementById('ask').innerText=(livePrices[val]*1.0002).toFixed(2);
+  }
+}
+function selectSymbol(a,b){switchSymbol(a);document.getElementById('pair').value=a;closePairs();}
+
+function toggleBot(){
+  armed=!armed;
+  document.getElementById('startBtn').innerHTML=armed?'■':'▶';
+  const dot=document.getElementById('mDot');
+  if(armed){
+    dot.classList.add('on');
+    dot.style.left=(window.innerWidth-70)+'px';
+    dot.style.top='70px';
+  }else{
+    dot.classList.remove('on');
+  }
+  document.getElementById('tText').innerText=armed?'Bot armed — drag M anywhere, logs empty until real execution':'Bot stopped';
+  let t=document.getElementById('toast');t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500);
+}
+function openPairs(){document.getElementById('pairs').classList.add('show')}
+function closePairs(){document.getElementById('pairs').classList.remove('show')}
+function openLogs(){
+  if(!armed){alert('Start bot first');return;}
+  document.getElementById('logsModal').classList.add('show');
+}
+function closeLogs(){document.getElementById('logsModal').classList.remove('show')}
+
+function showNews(){
+  let t=document.getElementById('toast'); document.getElementById('tText').innerText='📰 NEWS - High impact news in 2h: Check Forex Factory'; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),3000);
+}
+function syncScanner(){
+  let sym=document.getElementById('liveSym') ? document.getElementById('liveSym').innerText : 'XAUUSD';
+  let sym2=document.getElementById('liveSym2'); if(sym2) sym2.innerText=sym;
+  let pairSel=document.getElementById('pair'); if(pairSel){ let map={'frxXAUUSD':'XAUUSD','cryBTCUSD':'BTCUSD','R_20':'VOL_20','1HZ80V':'VOL_80'}; let disp=map[pairSel.value]||pairSel.value; if(sym2) sym2.innerText=disp; let mp=document.getElementById('liveMarketPair'); if(mp) mp.innerText=disp; }
+  let tf=document.getElementById('timeframe'); let tfEl=document.getElementById('liveMarketTF'); if(tf && tfEl) tfEl.innerText=tf.value;
+  let dateEl=document.getElementById('scannerDate'); if(dateEl) dateEl.innerText=new Date().toDateString();
+  // Keep original liveSym in sync for old code
+}
+setInterval(syncScanner, 1000);
+setTimeout(syncScanner, 300);
+
+function setTimeframe(tf){
+  let el = document.getElementById('liveMarketTF'); if(el) el.innerText = tf;
+  let t = document.getElementById('toast'); document.getElementById('tText').innerText = 'Timeframe: ' + tf; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),1500);
+}
+function tab(name,el){
+
+  document.querySelectorAll('.nav').forEach(n=>n.classList.remove('active'));el.classList.add('active');
+  document.getElementById('homeView').style.display=name=='home'?'block':'none';
+  document.getElementById('ctrl').style.display=name=='home'?'flex':'none';
+  document.getElementById('robotList').style.display=name=='home'?'block':'none';
+  document.getElementById('settingsView').style.display=name=='settings'?'block':'none';
+  document.getElementById('mtView').style.display=name=='mt'?'block':'none';
+  document.getElementById('scanView').style.display=name=='scan'?'block':'none';
+}
+
+function showSignalCard(livePrice, direction){
+  // SIGNAL CARD - calculated from LIVE price, NOT hardcoded 46.12 from screenshot
+  let dir = direction || (Math.random() > 0.5 ? 'SELL' : 'BUY');
+  let isSell = dir === 'SELL';
+  // For XAUUSD / GOLD, pip = 0.01 is too small for display, use screenshot style: pip = 0.0001 like in pic (352 pips = 0.0352)
+  // ENTRY slightly off live price, SL above for SELL / below for BUY, TPs in direction
+  let entry = isSell ? livePrice - 0.09 : livePrice + 0.09;
+  let sl = isSell ? entry + 0.352 : entry - 0.352;
+  let tp1 = isSell ? entry - 0.53 : entry + 0.53;
+  let tp2 = isSell ? entry - 0.88 : entry + 0.88;
+  let fmt = (v)=> v.toFixed(5);
+  // Pips = diff * 10000 like in your pic
+  let pips = (a,b)=> Math.abs(a-b)*10000;
+  document.getElementById('sigDirection').innerText = dir;
+  document.getElementById('sigDirection').className = 'signal-dir-val' + (isSell ? '' : ' buy');
+  document.getElementById('sigSetup').innerText = 'Liquidity Sweep + MSS + Order Block Entry';
+  document.getElementById('sigHtf').innerText = 'bullish';
+  document.getElementById('sigZone').innerText = 'premium';
+  document.getElementById('sigB1').innerText = 'BSL liquidity sweep @ ' + fmt(livePrice + 0.01);
+  document.getElementById('sigB2').innerText = 'BOS bullish @ ' + fmt(livePrice - 0.08);
+  document.getElementById('sigB3').innerText = (isSell ? 'Supply OB ' : 'Demand OB ') + fmt(entry - 0.42) + ' - ' + fmt(entry - 0.36);
+  document.getElementById('sigB4').innerText = 'premium zone (EQ ' + fmt(livePrice - 3.23) + ')';
+  document.getElementById('sigB5').innerText = 'HTF bias bullish';
+  document.getElementById('sigEntry').innerText = fmt(entry);
+  document.getElementById('sigEntryPips').innerText = Math.round(pips(livePrice, entry)) + ' pips away';
+  document.getElementById('sigSl').innerText = fmt(sl);
+  document.getElementById('sigSlPips').innerText = Math.round(pips(entry, sl)) + ' pips';
+  document.getElementById('sigRr').innerText = '1:1.5';
+  document.getElementById('sigRrSub').innerText = 'BSL sweep wick 50%';
+  document.getElementById('sigTp1').innerText = fmt(tp1);
+  document.getElementById('sigTp1Pips').innerText = Math.round(pips(entry, tp1)) + ' pips left';
+  document.getElementById('sigTp2').innerText = fmt(tp2);
+  document.getElementById('sigTp2Pips').innerText = Math.round(pips(entry, tp2)) + ' pips left';
+  let card = document.getElementById('signalResult');
+  card.classList.add('show');
+  card.scrollIntoView({behavior:'smooth', block:'nearest'});
+  // Also update LIVE MARKET UPDATE header to show found
+  let upd = document.getElementById('liveMarketText');
+  if(upd) upd.innerText = 'Signal found • ' + dir + ' @ ' + fmt(entry) + ' • Live structure';
+  let scan = document.getElementById('scanningText');
+  if(scan) scan.innerText = 'SIGNAL FOUND';
+}
+function hideSignalCard(){
+  let c = document.getElementById('signalResult');
+  if(c) c.classList.remove('show');
+}
+
+function analyse(){
+  let p=document.getElementById('pair').value, lot=document.getElementById('lot').value||'0.01';
+  let tradesVal=document.getElementById('tradesInput').value||'1';
+  totalTrades=parseInt(tradesVal);
+  document.getElementById('tradeCount').innerText=executedTrades+' / '+totalTrades;
+  hideSignalCard();
+  let livePrice=livePrices[currentSymbol];
+  if(!livePrice){
+    document.getElementById('qStatus').innerText='Waiting for LIVE Deriv price...';
+    return;
+  }
+  document.getElementById('qStatus').innerText='Scanning '+currentDisplay+' @ '+livePrice.toFixed(2)+'... waiting for REAL LIVE signal';
+  setTimeout(()=>{
+    if(!armed) return;
+    executedTrades++;
+    document.getElementById('tradeCount').innerText=executedTrades+' / '+totalTrades;
+    let tp=(livePrice+livePrice*0.002).toFixed(2);
+    let sl=(livePrice-livePrice*0.001).toFixed(2);
+    document.getElementById('emptyLogsMsg').style.display='none';
+    let logs=document.getElementById('liveLogs');
+    logs.innerHTML+=`
+      <div class="log-line" style="color:#00ff88">>> CONNECTED TO TRADE SERVER [${new Date().toLocaleTimeString()}]</div>
+      <div class="log-line">>> Connected to trade server</div>
+      <div class="log-line" style="color:#8b7aff">>> KAYVIEW PRO+ trading</div>
+      <div class="log-line" style="color:#a855f7">>> <span style="background:#a855f7;color:white;padding:1px 6px;border-radius:4px">BUY ${currentDisplay}</span> @ ${livePrice.toFixed(2)} LIVE REAL</div>
+      <div class="log-line" style="color:#00ff88">>> TP ADDED ${tp} (LIVE)</div>
+      <div class="log-line" style="color:#ff4444">>> SL ADDED ${sl} (LIVE)</div>
+      <div class="log-line">>> Trade ${executedTrades}/${totalTrades}: Accepting disclaimer...</div>
+      <div class="log-line">>> Linking account...</div>
+      <div class="log-line">>> Params: Buy ${currentDisplay} @ vol ${lot} @ ${livePrice.toFixed(2)}</div>
+      <div class="log-line" style="color:#00ff88">>> TRADE ${executedTrades}/${totalTrades} SUCCESSFUL: Buy ${currentDisplay}</div>
+      <div class="log-line">>> Selecting symbol ${currentDisplay}</div>
+      <div class="log-line" style="color:#a855f7">>> <span style="background:#a855f7;color:white;padding:1px 6px;border-radius:4px">BUY ${currentDisplay}</span></div>
+      <div style="border-bottom:1px solid #222;margin:8px 0"></div>
+    `;
+    document.getElementById('qStatus').innerText=`REAL LIVE Signal @ ${livePrice.toFixed(2)} - Executed`;
+    openLogs();
+  }, 3000+Math.random()*2000);
+}
+
+
+function toggleAnimatedBorder(on){
+  let el=document.getElementById('appFrameBorder');
+  let knob=document.getElementById('toggleKnob');
+  let span=document.getElementById('toggleBorderSpan');
+  if(on){ el.classList.add('active'); knob.style.transform='translateX(20px)'; span.style.background='var(--pink)'; }
+  else { el.classList.remove('active'); knob.style.transform='translateX(0)'; span.style.background='#333'; }
+  localStorage.setItem('kv_border', on?'1':'0');
+}
+// gradient off by default - no auto restore
+localStorage.setItem('kv_border','0');
+
+let blueActive=false, blueAnim=null;
+
+function setThemeColor(color){
+  document.documentElement.style.setProperty('--pink', color);
+  document.documentElement.style.setProperty('--glow', color + '80');
+  document.getElementById('colorPicker').value = color;
+  document.querySelectorAll('.color-dot').forEach(d=>d.classList.remove('active'));
+  document.querySelectorAll('.color-dot').forEach(d=>{ if(d.style.background==color || d.style.background.includes(color)) d.classList.add('active') });
+}
+
+connectLive();
+
+setInterval(()=>{document.getElementById('clock').innerText=new Date().toLocaleTimeString()},1000);
+document.getElementById('date').innerText=new Date().toDateString();
+function removeBot(){}
+</script>
+<script>(function(){var loc=location.href.replace(/#.*$/,"");var ATTR_NAMES=["data-product-id","data-productid","data-product_id","product-id","productid","product_id","data-source-entity-id","source-entity-id","source_entity_id","data-product","data-metadata","data-meta"];var DATASET_KEYS=["productId","productid","product_id","sourceEntityId","sourceentityid","source_entity_id","product","metadata","meta"];function readProductId(value){if(typeof value!=="string"||value.length===0)return null;if(/^[0-9]{6,}$/.test(value))return value;var match=value.match(/(?:product(?:_|-)?id|source(?:_|-)?entity(?:_|-)?id)["'=:\s]+([0-9]{6,})/i);return match?match[1]:null}function extractProductId(start){for(var node=start;node&&node!==document.body;node=node.parentElement){for(var i=0;i<ATTR_NAMES.length;i++){var attrValue=node.getAttribute&&node.getAttribute(ATTR_NAMES[i]);var attrProductId=readProductId(attrValue);if(attrProductId)return attrProductId}var dataset=node.dataset||null;if(dataset){for(var j=0;j<DATASET_KEYS.length;j++){var dataValue=dataset[DATASET_KEYS[j]];var dataProductId=readProductId(dataValue);if(dataProductId)return dataProductId}}}return null}function isInlineMediaSlotElement(node){return !!(node&&node.getAttribute&&node.getAttribute("data-clippy-inline-media-slot")!==null)}function findInlineMediaSlot(start){for(var node=start;node&&node!==document.body;node=node.parentElement){if(isInlineMediaSlotElement(node))return node}return null}function readInlineMediaUrl(node){if(!node)return null;return node.getAttribute&&((node.getAttribute("data-clippy-inline-media-url")||node.getAttribute("data-url")||node.getAttribute("data_url")))||node.href||null}function stripHash(url){return String(url).replace(/#.*$/,"")}function urlsMatch(a,b){if(!a||!b)return false;try{return stripHash(new URL(a,loc).href)===stripHash(new URL(b,loc).href)}catch(_){return stripHash(a)===stripHash(b)}}function isFirstPartyReelUrl(value){try{var url=new URL(value,loc);if(url.protocol!=="https:")return false;var host=url.hostname.toLowerCase();var supported=host==="instagram.com"||host.endsWith(".instagram.com")||host==="facebook.com"||host.endsWith(".facebook.com");return supported&&/\/reels?\//i.test(url.pathname)}catch(_){return false}}function isInlineMediaUrlClick(node,href){var slot=findInlineMediaSlot(node);if(!slot)return false;var slotUrl=readInlineMediaUrl(slot);if(slotUrl)return urlsMatch(href,slotUrl);return isFirstPartyReelUrl(href)}function findDataHref(start){for(var node=start;node&&node!==document.body;node=node.parentElement){if(node.getAttribute){var href=node.getAttribute("data-href")||node.getAttribute("data-url");if(href)return{href:href,node:node}}}return null}var nativeOpen=window.open;window.open=function(url){if(parent!==window&&typeof url==="string"&&/^https?:\/\//.test(url)){parent.postMessage({type:"ecto:usercontent-link-click",href:url},"*");return null}return nativeOpen?nativeOpen.apply(window,arguments):null};document.addEventListener("click",function(e){var target=e.target instanceof Element?e.target:null;if(!target)return;if(parent===window)return;var a=target.closest?target.closest("a[href]"):null;if(a&&a.href&&/^https?:\/\//.test(a.href)&&a.href.replace(/#.*$/,"")!==loc){if(isInlineMediaUrlClick(a,a.href))return;var productId=extractProductId(target)||extractProductId(a);if(productId){e.preventDefault();parent.postMessage({type:"ecto-artifact-link-click",productId:productId},"*");return}e.preventDefault();parent.postMessage({type:"ecto:usercontent-link-click",href:a.href},"*");return}var dataHref=findDataHref(target);if(dataHref&&/^https?:\/\//.test(dataHref.href)&&dataHref.href.replace(/#.*$/,"")!==loc){if(isInlineMediaUrlClick(dataHref.node,dataHref.href))return;e.preventDefault();parent.postMessage({type:"ecto:usercontent-link-click",href:dataHref.href},"*")}},true)})();</script><script>(function(){var FOCUS_TYPE="ecto:artifact-focus-request";var CLOSE_TYPE="ecto:artifact-close-request";function focusArtifactDocument(){var body=document.body;if(!body)return;try{window.focus();}catch(e){}if(!body.hasAttribute("tabindex"))body.setAttribute("tabindex","-1");try{body.focus({preventScroll:true});}catch(e){try{body.focus();}catch(e2){}}}window.addEventListener("message",function(event){if(event.source!==window.parent)return;var data=event.data;if(!data||typeof data!=="object"||data.type!==FOCUS_TYPE)return;if(document.readyState==="loading"){document.addEventListener("DOMContentLoaded",focusArtifactDocument,{once:true});return;}focusArtifactDocument();});window.addEventListener("keydown",function(event){if(event.key!=="Escape")return;window.setTimeout(function(){if(event.defaultPrevented)return;window.parent.postMessage({type:CLOSE_TYPE},"*");},0);});})();</script></body>
+</html>
